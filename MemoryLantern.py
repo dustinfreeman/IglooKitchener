@@ -49,10 +49,32 @@ def start_avatar():
 
 #start_avatar()
 
+DOWNSAMPLE = 16 #for visualization and saving.
+
 class DepthFrame:
+	#this totally exploits duck typing, so this
+	# class looks like an openni.DepthMap
+
+
 	def __init__(self,depthMap):
-		self.map = depthMap
 		self.time = time.clock()
+
+		self.width = depthMap.width
+		self.height = depthMap.height
+		self.map = np.zeros((self.width/DOWNSAMPLE,self.height/DOWNSAMPLE))
+
+		#copy dat map
+		for y in range(0, self.height, DOWNSAMPLE):
+			for x in range(0, self.width, DOWNSAMPLE):
+				self[x,y] = depthMap[x,y]
+
+	def __setitem__(self, addr_tuple, value):
+		self.map[ addr_tuple[0]/DOWNSAMPLE, addr_tuple[1]/DOWNSAMPLE] = np.float16(value);
+
+	def __getitem__(self, addr_tuple):
+		return self.map[ addr_tuple[0]/DOWNSAMPLE, addr_tuple[1]/DOWNSAMPLE];
+
+
 
 class DepthSequence:
 	#intended to be a saveable sequence of PyOpenNI's openni.DepthMap
@@ -81,10 +103,14 @@ class DepthSequence:
 			return
 
 		#check if we should be on the next frame
-		if self.sequence[self.play_marker + 1].time - recording_start >= playing_timespan:
+		if playing_timespan >= self.sequence[self.play_marker + 1].time - recording_start:
 			self.play_marker += 1
+			
+		# print '---------'
+		# print self.sequence[self.play_marker + 1].time - recording_start
+		# print playing_timespan
 
-		return self.sequence[self.play_marker].map
+		return self.sequence[self.play_marker]
 
 
 
@@ -101,18 +127,24 @@ def stop_sequence():
 	global current_sequence
 	global sequence_filename
 
+	print 'saving sequence to ' + sequence_filename + ' ...'
+
 	seq_file = open(sequence_filename,'w')
 	pickle.dump(current_sequence, seq_file)
 	seq_file.close()
-	print 'sequence saved to ' + sequence_filename
+	print 'sequence saved.'
 	current_sequence = None
 	sequence_filename = None
 
 playing_sequence = None
 def play_sequence(filename):
+	global playing_sequence
+
 	seq_file = open(filename, 'r')
 	sequence = pickle.load(seq_file)
 	seq_file.close()
+
+	print 'play sequence ' + filename + ' loaded.'
 
 	playing_sequence = sequence
 
@@ -189,10 +221,15 @@ def update_kinect():
 
 	#playing/injecting
 	if playing_sequence != None:
+		play_depthMap = playing_sequence.getCurrentDepthMap()
+
+		print 'playing...' + str(playing_sequence.play_marker) + '/' + str(len(playing_sequence.sequence))
 		if playing_sequence.play_finished:
 			playing_sequence = None
+			print 'play finished.'
 		else:
-			depthMap = playing_sequence.getCurrentDepthMap()
+			depthMap = play_depthMap
+		
 
 	#print type(depth)
 	#print type(depth.map)
@@ -206,7 +243,6 @@ def update_kinect():
 	return depthMap
 	
 
-DOWNSAMPLE = 16
 MESH_VISIBLE = 1
 def make_kinect_mesh(depthMap):
 	#Build cube
