@@ -59,22 +59,48 @@ class DepthSequence:
 	
 	def __init__(self):
 		self.sequence = []
-		self.play_marker = 0
+		self.play_marker = 0 #index in sequence
+		self.play_start = time.clock()
+		self.play_finished = False
 
-	def addDepthMap(depthMap):
+	def addDepthMap(self,depthMap):
 		frame = DepthFrame(depthMap)
 		self.sequence.append(frame)
 
+	def getCurrentDepthMap(self):
+		now = time.clock()
+
+		if len(self.sequence) < 2:
+			return
+
+		recording_start = self.sequence[0].time
+		playing_timespan = now - self.play_start
+
+		if self.play_marker >= len(self.sequence) - 2:
+			self.play_finished = True
+			return
+
+		#check if we should be on the next frame
+		if self.sequence[self.play_marker + 1].time - recording_start >= playing_timespan:
+			self.play_marker += 1
+
+		return self.sequence[self.play_marker].map
 
 
 
 current_sequence = None
 sequence_filename = None
 def start_sequence(filename):
+	global current_sequence
+	global sequence_filename
+
 	current_sequence = DepthSequence()
 	sequence_filename = filename
 
 def stop_sequence():
+	global current_sequence
+	global sequence_filename
+
 	seq_file = open(sequence_filename,'w')
 	pickle.dump(current_sequence, seq_file)
 	seq_file.close()
@@ -149,6 +175,9 @@ class DepthBackgroundSubtraction:
 		
 	
 def update_kinect():
+	global current_sequence
+	global playing_sequence
+
 	# Update to next frame
 	nRetVal = ctx.wait_one_update_all(depth)
 	
@@ -157,6 +186,13 @@ def update_kinect():
 	#saving out
 	if current_sequence != None:
 		current_sequence.addDepthMap(depthMap)
+
+	#playing/injecting
+	if playing_sequence != None:
+		if playing_sequence.play_finished:
+			playing_sequence = None
+		else:
+			depthMap = playing_sequence.getCurrentDepthMap()
 
 	#print type(depth)
 	#print type(depth.map)
