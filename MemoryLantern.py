@@ -59,9 +59,39 @@ class DepthSequence:
 	
 	def __init__(self):
 		self.sequence = []
+		self.play_marker = 0
+
+	def addDepthMap(depthMap):
+		frame = DepthFrame(depthMap)
+		self.sequence.append(frame)
 
 
-	
+
+
+current_sequence = None
+sequence_filename = None
+def start_sequence(filename):
+	current_sequence = DepthSequence()
+	sequence_filename = filename
+
+def stop_sequence():
+	seq_file = open(sequence_filename,'w')
+	pickle.dump(current_sequence, seq_file)
+	seq_file.close()
+	print 'sequence saved to ' + sequence_filename
+	current_sequence = None
+	sequence_filename = None
+
+playing_sequence = None
+def play_sequence(filename):
+	seq_file = open(filename, 'r')
+	sequence = pickle.load(seq_file)
+	seq_file.close()
+
+	playing_sequence = sequence
+
+	#TODO play sequence
+
 
 BACKGROUND_THRESHOLD = 100 #mm must be in front of something to be beyond the background.
 class DepthBackgroundSubtraction:
@@ -123,14 +153,18 @@ def update_kinect():
 	nRetVal = ctx.wait_one_update_all(depth)
 	
 	depthMap = depth.map
+
+	#saving out
+	if current_sequence != None:
+		current_sequence.addDepthMap(depthMap)
+
 	#print type(depth)
 	#print type(depth.map)
 	# Get the coordinates of the middle pixel
-	x = depthMap.width / 2
-	y = depthMap.height / 2
-
+	#x = depthMap.width / 2
+	#y = depthMap.height / 2
 	# Get the pixel at these coordinates
-	pixel = depthMap[x,y]
+	#pixel = depthMap[x,y]
 
 	#print "The middle pixel is %d millimeters away." % pixel
 	return depthMap
@@ -209,9 +243,12 @@ def update_kinect_mesh(kinect_mesh, depthMap, backgroundMap = None):
 GET_FRESH_BACKGROUND = False
 BACKGROUND_FILENAME = 'background'
 
+backgroundMap = None
+
 def get_kinect_background():
 	print 'doing background subtraction'
-
+	
+	global backgroundMap
 	background = None
 
 	if not GET_FRESH_BACKGROUND:
@@ -219,33 +256,44 @@ def get_kinect_background():
 		   	background_file = open(BACKGROUND_FILENAME,'r')
 		   	background = pickle.load(background_file)
 		   	background_file.close
+
+		   	#set global variable
+			backgroundMap = background
+		   	
 		   	print 'background loaded'
 		except IOError:
 		   	print 'Could not find or open background file.'
 
 	if background == None:
-		print 'Capturing new background'
+		get_fresh_background()
 
-		background = DepthBackgroundSubtraction()
+	
+def get_fresh_background():
+	print 'Capturing new background'
+	global backgroundMap
+
+	background = DepthBackgroundSubtraction()
+	
+	for i in range(4):
+		print '.'
+		depthMap = update_kinect()
+		background.addToBackground(depthMap)
+		time.sleep(0.1)
 		
-		for i in range(4):
-			print '.'
-			depthMap = update_kinect()
-			background.addToBackground(depthMap)
-			time.sleep(0.1)
-			
-		print 'done background subtraction.'
+	print 'done background subtraction.'
 
-		print 'saving out background'
-		   
-		background_file = open(BACKGROUND_FILENAME,'w')
-		pickle.dump(background,background_file)
-		background_file.close()
+	print 'saving out background'
+	   
+	background_file = open(BACKGROUND_FILENAME,'w')
+	pickle.dump(background,background_file)
+	background_file.close()
 
-	
-	return background
-	
-backgroundMap = get_kinect_background()
+	#set global variable
+	backgroundMap = background
+
+
+#always get background at beginning
+get_kinect_background()
 
 
 #create mesh initially.
