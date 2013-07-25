@@ -134,7 +134,10 @@ class ShadowProjector(object):
 
 	def setArea(self,area):
 		"""Set [width,height] area of orthographic projection of shadow"""
-		proj = viz.Matrix.ortho(-area[0]/2.0,area[0]/2.0,-area[1]/2.0,area[1]/2.0,0.1,1000)
+		#proj = viz.Matrix.ortho(-area[0]/2.0,area[0]/2.0,-area[1]/2.0,area[1]/2.0,0.1,1000)
+		proj = viz.Matrix.perspective(60,1,0.1,100)
+		#need look vector? i.e.(0,0,1)
+		
 		self.shadowPass.setProjectionMatrix(proj)
 		self.texProj.ortho(area[0],area[1])
 

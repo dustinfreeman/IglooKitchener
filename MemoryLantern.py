@@ -20,6 +20,8 @@ depth.fps = 30
 # Start generating
 ctx.start_generating_all()
 
+frameCount = 0
+
 #load scene
 ground = viz.add('tut_ground.wrl')
 ground2 = viz.add('tut_ground.wrl', pos = (0,0,5), euler = (0,270,0) )
@@ -30,11 +32,12 @@ SHADOW_RES = 256
 
 #Postion of shadow projector
 SHADOW_POS = [0,3,2]
+SHADOW_EULER = [0,25,0]
 
 #Controls size of orthographic shadow projector
 #Large values mean larger area is covered, but resolution will be diluted
 SHADOW_AREA = [5,5]
-shadow = Shadow.ShadowProjector(size=SHADOW_RES,pos=SHADOW_POS,area=SHADOW_AREA, euler = [0,10,0] )
+shadow = Shadow.ShadowProjector(size=SHADOW_RES,pos=SHADOW_POS,area=SHADOW_AREA, euler = SHADOW_EULER )
 #Add ground as shadow receiver
 shadow.addReceiver(ground)
 shadow.addReceiver(ground2)
@@ -271,7 +274,7 @@ def make_kinect_mesh(depthMap):
 	return kinect_mesh
 
 
-
+BACKGROUND_VISIBLE = True
 def update_kinect_mesh(kinect_mesh, depthMap, backgroundMap = None):
 	kinect_mesh.clearVertices()
 	
@@ -281,7 +284,7 @@ def update_kinect_mesh(kinect_mesh, depthMap, backgroundMap = None):
 			(depth_val, isForeground) = backgroundMap.getForegroundPixel(depthMap,x,y)
 			depth_val /=(4*1000.0)
 			#depth_val = depthMap[x,y]/(4*1000.0);
-			if (depth_val == 0.0 or not isForeground):
+			if (depth_val == 0.0 or (not isForeground and not BACKGROUND_VISIBLE) ):
 				continue
 			
 			pixel_colour_val = 1 - depthMap[x,y]/(1000.0 * 4.0)
@@ -310,6 +313,17 @@ def update_kinect_mesh(kinect_mesh, depthMap, backgroundMap = None):
 				depth_val, \
 				pixel_colour )
 			
+
+def update_shadows():
+	#SHADOW_POS = [0,3,2]
+	#SHADOW_EULER = [0,25,0]
+
+	#slowly moves shadow, ideally should react to projection.
+	
+	SHADOW_POS[1] = 3 + (1.0/100)*(frameCount%100)
+
+	shadow.setPosition(SHADOW_POS)
+	#shadow.setEuler((-5 + frameCount % 10, 25, 0 ))
 
 	
 GET_FRESH_BACKGROUND = False
@@ -379,8 +393,12 @@ shadow.addCaster(kinect_mesh)
 
 
 def frame_tick():
+	global frameCount
+
+	frameCount+=1
 	depthMap = update_kinect()
 	update_kinect_mesh(kinect_mesh, depthMap, backgroundMap)
+	update_shadows()
 	
 	
 #frame_tick()
