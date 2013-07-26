@@ -3,7 +3,7 @@ import numpy as np
 import time 
 import pickle
 
-import Shadow
+from ShadowTheatre import *
 
 from openni import *
 ctx = Context()
@@ -37,7 +37,7 @@ SHADOW_EULER = [0,25,0]
 #Controls size of orthographic shadow projector
 #Large values mean larger area is covered, but resolution will be diluted
 SHADOW_AREA = [5,5]
-shadow = Shadow.ShadowProjector(size=SHADOW_RES,pos=SHADOW_POS,area=SHADOW_AREA, euler = SHADOW_EULER )
+shadow = ShadowProjector(size=SHADOW_RES,pos=SHADOW_POS,area=SHADOW_AREA, euler = SHADOW_EULER )
 #Add ground as shadow receiver
 shadow.addReceiver(ground)
 shadow.addReceiver(ground2)
