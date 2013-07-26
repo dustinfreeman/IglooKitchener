@@ -148,6 +148,8 @@ class ShadowProjector(object):
 
 		self.shadowPass.setProjectionMatrix(proj)
 		self.texProj.ortho(area[0],area[1])
+		#WARNING - the above uses ortho, which is probably not right.
+
 
 	def visible(self,mode):
 		"""Enable shadow projector"""

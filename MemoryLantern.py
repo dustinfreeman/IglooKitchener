@@ -31,7 +31,7 @@ ground2 = viz.add('tut_ground.wrl', pos = (0,0,5), euler = (0,270,0) )
 SHADOW_RES = 256
 
 #Postion of shadow projector
-SHADOW_POS = [0,3,2]
+SHADOW_POS = [0,2,2]
 SHADOW_EULER = [0,25,0]
 
 #Controls size of orthographic shadow projector
@@ -282,11 +282,12 @@ def update_kinect_mesh(kinect_mesh, depthMap, backgroundMap = None):
 		for x in range(0,depthMap.width,DOWNSAMPLE):
 			
 			(depth_val, isForeground) = backgroundMap.getForegroundPixel(depthMap,x,y)
-			depth_val /=(4*1000.0)
 			#depth_val = depthMap[x,y]/(4*1000.0);
 			if (depth_val == 0.0 or (not isForeground and not BACKGROUND_VISIBLE) ):
 				continue
-			
+
+			depth_val /=(4*1000.0)
+
 			pixel_colour_val = 1 - depthMap[x,y]/(1000.0 * 4.0)
 			pixel_colour = [ pixel_colour_val, pixel_colour_val, pixel_colour_val, MESH_VISIBLE ]
 			if isForeground:
@@ -320,7 +321,7 @@ def update_shadows():
 
 	#slowly moves shadow, ideally should react to projection.
 	
-	SHADOW_POS[1] = 3 + (1.0/100)*(frameCount%100)
+	SHADOW_POS[0] = -1 + (2.0/100)*(frameCount%100)
 
 	shadow.setPosition(SHADOW_POS)
 	#shadow.setEuler((-5 + frameCount % 10, 25, 0 ))
