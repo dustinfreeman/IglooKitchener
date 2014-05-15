@@ -27,6 +27,8 @@ speed = 2000000 # move speed
 rot_speed = 17 # rotate speed
 GO_FAST = True
 
+BOUNDS_CHECK = True
+
 ################################
 PIECES = []
 ORIGINAL_PIECES = []
@@ -242,7 +244,7 @@ def artTrackerUpdate():
 	fps_speed = elapsed*speed
 	fps_rot_speed = elapsed*rot_speed
 	
-	if (GO_FAST):
+	if GO_FAST:
 		fps_speed *= 10
 		fps_rot_speed *= 5
 	
@@ -251,18 +253,42 @@ def artTrackerUpdate():
 	
 	cave_origin.setPosition(artTracker.jy*artTracker.x2*fps_speed, artTracker.jy*artTracker.y2*fps_speed, artTracker.jy*artTracker.z2*fps_speed,viz.REL_LOCAL)
 	cave_origin.setEuler(fps_rot_speed*artTracker.jx,0,0,viz.REL_LOCAL)	 
-	compass.setPosition(cave_origin.getPosition())
+	
 	
 	pos = cave_origin.getPosition()
 	eul = cave_origin.getEuler()
 	#check out of bounds
 	
+	#print pos
 	
-
-#	updateVisibility(cave_origin.getPosition())
-#def updateVisibilityHive():
-#	pass
+	if BOUNDS_CHECK:
+		#teleport!
+		
+		#low row
+		if pos[2] < -unit*0.5:
+			#send to last row
+			pos[2] += rows*2*unit
+			cave_origin.setPosition(pos)
+		#high row
+		if pos[2] > (2*rows - 0.5)*unit:
+			pos[2] -= rows*2*unit
+			cave_origin.setPosition(pos)
+		
+		#low column
+		if pos[0] < -(columns + 0.5)*unit:
+			pos[0] += columns*2*unit
+			cave_origin.setPosition(pos)
+		#high column
+		if pos[0] > (columns - 0.5)*unit:
+			pos[0] -= columns*2*unit
+			cave_origin.setPosition(pos)
+		
 	
+	
+	#any setting based on position.
+	compass.setPosition(cave_origin.getPosition())
+	
+		
 ####################
 
 PIECESNAMES=[
@@ -393,12 +419,19 @@ def placePieces_FlippedConfiguration():
 	#				[flip both]		[flip rows]
 
 	ALL_COLOR = (0.2,0.8,0.8)
+	ALL_SAME_COLOUR = False
 
 	ORIGINAL_COLOUR = ALL_COLOR
 	FLIP_COLUMN_COLOUR = (0.2,0.2,0.8)
 	FLIP_ROW_COLOUR = (0.2,0.8,0.2)
 	FLIP_BOTH_COLOUR = (0.8,0.2,0.2)
 	SKIN_COLOUR = (0.8,0.8,0.8)
+	
+	if ALL_SAME_COLOUR:
+		FLIP_COLUMN_COLOUR = ALL_COLOR
+		FLIP_ROW_COLOUR = ALL_COLOR
+		FLIP_BOTH_COLOUR = ALL_COLOR
+		SKIN_COLOUR = ALL_COLOR
 
 	# draw the flyable area
 	for row in range(rows):
