@@ -1,4 +1,4 @@
-﻿ #import viz
+ #import viz
 import vizcave
 import viztracker
 import vizact
@@ -22,14 +22,23 @@ polyMode = viz.POLY_WIRE
 viz.window.setPolyMode(viz.POLY_WIRE)
 viz.MainWindow.fov(50)
 viz.vsync(0)#this may increase frame rate but may get tears
-speed = 22000 # move speed
-rot_speed = 0.1 # rotate speed
 
-speed *= 5 #MUST GO FASTER
-rot_speed *= 5
+speed = 2000000 # move speed
+rot_speed = 17 # rotate speed
+GO_FAST = True
+
+################################
+PIECES = []
+ORIGINAL_PIECES = []
+scaling = 5600
+unit = 10 * scaling
+rows = 7 #	horizontal
+columns = 8
 
 compass = viz.addChild('Meshes/arrow.osgb')
 compass.color(0.2,0.8,0.8)
+
+viz.fog(1, unit)
 
 #####################
 #Setup OSC
@@ -221,27 +230,38 @@ def trackingEnable():
 	artTracker.enable
 	
 def flip():
-	# flips all the pieces. Not useful.
-
 	for piece in PIECES:
 		curr_scale = piece.getScale()
 		piece.setScale(-curr_scale[0], curr_scale[1], curr_scale[2])
 	#print "done flip!"
 	
 def artTrackerUpdate():
+	
+	#print viz.elapsed() #about 0.003
+	elapsed = viz.elapsed()
+	fps_speed = elapsed*speed
+	fps_rot_speed = elapsed*rot_speed
+	
+	if (GO_FAST):
+		fps_speed *= 10
+		fps_rot_speed *= 5
+	
 	viewTracker.setPosition(artTracker.x,artTracker.y,artTracker.z+depth/2)
 	viewTracker.setEuler(artTracker.yaw,artTracker.pitch,artTracker.roll)
-	cave_origin.setPosition(artTracker.jy*artTracker.x2*speed,artTracker.jy*artTracker.y2*speed,artTracker.jy*artTracker.z2*speed,viz.REL_LOCAL)
-	cave_origin.setEuler(rot_speed*artTracker.jx,0,0,viz.REL_LOCAL)	 
+	
+	cave_origin.setPosition(artTracker.jy*artTracker.x2*fps_speed, artTracker.jy*artTracker.y2*fps_speed, artTracker.jy*artTracker.z2*fps_speed,viz.REL_LOCAL)
+	cave_origin.setEuler(fps_rot_speed*artTracker.jx,0,0,viz.REL_LOCAL)	 
 	compass.setPosition(cave_origin.getPosition())
 	
 	pos = cave_origin.getPosition()
 	eul = cave_origin.getEuler()
 	#check out of bounds
 	
-# def updateVisibilityHive():
-# 	updateVisibility(cave_origin.getPosition())
-# 	pass
+	
+
+#	updateVisibility(cave_origin.getPosition())
+#def updateVisibilityHive():
+#	pass
 	
 ####################
 
@@ -311,13 +331,6 @@ PIECESNAMES=[
 'TerrainTestsSetof8/S08.OSGB',
 ]
 
-################################
-PIECES = []
-scaling = 5600
-unit = 10 * scaling
-rows = 7 #	horizontal
-columns = 8
-
 def getPieceName(column, row):
 	#print("index " + str(row*columns + column))
 	index = row*columns + column
@@ -328,13 +341,16 @@ def getPieceName(column, row):
 def getPiece(column, row):
 	#print ("index " + str(row*columns + column));
 	return PIECES[row*columns + column]
+	
+def getOriginalPiece(column, row):
+	return ORIGINAL_PIECES[row*columns + column]
 
 def placePieces():	
 	curRow = 0
 	curCol = 0
 	for Name in PIECESNAMES:
 		PIECES.append(viz.addChild(Name))
-	
+
 	#old piece placement code
 #	for piece in PIECES:
 #		piece.setPosition(curCol * unit, 0 ,curRow * unit)
@@ -343,7 +359,7 @@ def placePieces():
 #		if curCol == columns:
 #			curCol = 0
 #			curRow = curRow + 1
-			
+
 	#using getPiece refactor
 	for row in range(rows):
 		for column in range(columns):
@@ -376,12 +392,12 @@ def placePieces_FlippedConfiguration():
 	# 				[flip columns] 	[original]
 	#				[flip both]		[flip rows]
 
-	ALL_COLOR = (0.8,0.2,0.2)
+	ALL_COLOR = (0.2,0.8,0.8)
 
 	ORIGINAL_COLOUR = ALL_COLOR
-	FLIP_ROW_COLOUR = (0.2,0.8,0.2)
 	FLIP_COLUMN_COLOUR = (0.2,0.2,0.8)
-	FLIP_BOTH_COLOUR = (0.2,0.8,0.8)
+	FLIP_ROW_COLOUR = (0.2,0.8,0.2)
+	FLIP_BOTH_COLOUR = (0.8,0.2,0.2)
 	SKIN_COLOUR = (0.8,0.8,0.8)
 
 	# draw the flyable area
@@ -391,21 +407,124 @@ def placePieces_FlippedConfiguration():
 
 			#original
 			piece = viz.addChild(piece_name)
+			ORIGINAL_PIECES.append(piece)
 			PIECES.append(piece)
 			piece.color(ORIGINAL_COLOUR)
 			piece.setPosition(column*unit, 0, row*unit)
 			piece.setScale(scaling, scaling, scaling)
 
 			#flip column
+			piece = piece.copy()
+			PIECES.append(piece)
+			piece.color(FLIP_COLUMN_COLOUR)
+			piece.setPosition((-1-column)*unit, 0, row*unit)
+			piece.setScale(-scaling, scaling, scaling)
 
 			#flip row
-
+			piece = piece.copy()
+			PIECES.append(piece)
+			piece.color(FLIP_ROW_COLOUR)
+			piece.setPosition(column*unit, 0, (2*rows - row - 1)*unit)
+			piece.setScale(scaling, scaling, -scaling)
 
 			#flip both
-
-	#draw the skin
-
-
+			piece = piece.copy()
+			PIECES.append(piece)
+			piece.color(FLIP_BOTH_COLOUR)
+			piece.setPosition((-1-column)*unit, 0, (2*rows - row - 1)*unit)
+			piece.setScale(-scaling, scaling, -scaling)
+			
+	#draw the skin - only 1 deep
+	#iterate first row
+	row = 0
+	for column in range(columns):
+		original_piece = getOriginalPiece(column, row)
+		
+		#original
+		piece = original_piece.copy()
+		PIECES.append(piece)
+		piece.color(SKIN_COLOUR)
+		piece.setPosition(column*unit, 0, (row-1)*unit)
+		piece.setScale(scaling, scaling, -scaling)
+		
+		#flip column
+		piece = original_piece.copy()
+		PIECES.append(piece)
+		piece.color(SKIN_COLOUR)
+		piece.setPosition((-1-column)*unit, 0, (row-1)*unit)
+		piece.setScale(-scaling, scaling, -scaling)
+		
+		#flip row
+		piece = original_piece.copy()
+		PIECES.append(piece)
+		piece.color(SKIN_COLOUR)
+		piece.setPosition(column*unit, 0, (2*rows - row - 1 + 1)*unit)
+		piece.setScale(scaling, scaling, scaling)
+		
+		#flip both
+		piece = original_piece.copy()
+		PIECES.append(piece)
+		piece.color(SKIN_COLOUR)
+		piece.setPosition((-1-column)*unit, 0, (2*rows - row - 1 + 1)*unit)
+		piece.setScale(-scaling, scaling, scaling)
+	
+	#iterate outer column
+	column = columns - 1
+	for row in range(rows):
+		original_piece = getOriginalPiece(column, row)
+		
+		#original
+		piece = original_piece.copy()
+		PIECES.append(piece)
+		piece.color(SKIN_COLOUR)
+		piece.setPosition((columns)*unit, 0, row*unit)
+		piece.setScale(-scaling, scaling, scaling)
+		
+		#flip column
+		piece = original_piece.copy()
+		PIECES.append(piece)
+		piece.color(SKIN_COLOUR)
+		piece.setPosition((-columns - 1)*unit, 0, row*unit)
+		piece.setScale(scaling, scaling, scaling)
+		
+		#flip row
+		piece = original_piece.copy()
+		PIECES.append(piece)
+		piece.color(SKIN_COLOUR)
+		piece.setPosition((columns)*unit, 0, (2*rows - row - 1)*unit)
+		piece.setScale(-scaling, scaling, -scaling)
+		
+		#flip both
+		piece = original_piece.copy()
+		PIECES.append(piece)
+		piece.color(SKIN_COLOUR)
+		piece.setPosition((-columns - 1)*unit, 0, (2*rows - row - 1)*unit)
+		piece.setScale(scaling, scaling, -scaling)
+	
+	
+	#do corners
+	corner_piece = getOriginalPiece(columns-1, 0)
+	#original
+	corner_piece = corner_piece.copy()
+	PIECES.append(corner_piece)
+	corner_piece.color(SKIN_COLOUR)
+	corner_piece.setPosition(columns*unit, 0, (-1)*unit)
+	corner_piece.setScale(-scaling, scaling, -scaling)
+	#flip column
+	corner_piece = corner_piece.copy()
+	PIECES.append(corner_piece)
+	corner_piece.setPosition((-columns - 1)*unit, 0, (-1)*unit)
+	corner_piece.setScale(scaling, scaling, -scaling)
+	#flip row
+	corner_piece = corner_piece.copy()
+	PIECES.append(corner_piece)
+	corner_piece.setPosition(columns*unit, 0, (2*rows)*unit)
+	corner_piece.setScale(-scaling, scaling, scaling)
+	#flip both
+	corner_piece = corner_piece.copy()
+	PIECES.append(corner_piece)
+	corner_piece.setPosition((-columns - 1)*unit, 0, (2*rows)*unit)
+	corner_piece.setScale(scaling, scaling, scaling)
 
 
 def placePieceSkin(num_tiles_border = 1):
@@ -424,7 +543,7 @@ def placePieceSkin(num_tiles_border = 1):
 			piece.color(SKIN_COLOR)
 			piece.setPosition(column * unit, 0, (-1 -row)*unit)
 			piece.setScale(scaling, scaling, -scaling)
-	
+
 	#along z = 0 (top column)
 	#print ("ADDING TOP COLUMN")
 	for column in range(num_tiles_border):
@@ -445,7 +564,7 @@ def placePieceSkin(num_tiles_border = 1):
 	corner_piece.color(SKIN_COLOR)
 	corner_piece.setPosition(-1*unit, 0, -1*unit)
 	corner_piece.setScale(-scaling, scaling, -scaling)
-	
+
 	#along x = columns (bottom row)
 	#print ("ADDING BOTTOM ROW")
 	for row in range(rows - 1, rows - 1 - num_tiles_border, - 1):
@@ -458,7 +577,7 @@ def placePieceSkin(num_tiles_border = 1):
 			piece.setPosition(column * unit, 0, (rows - 1 + (rows - row))*unit)
 			#print str(piece.getPosition()[0]/unit) + "," + str(piece.getPosition()[2]/unit)
 			piece.setScale(scaling, scaling, -scaling)
-	
+
 	#along z = rows (bottom column)
 	for column in range(columns - 1, columns - 1 - num_tiles_border, -1):
 		for row in range(rows):
@@ -469,7 +588,7 @@ def placePieceSkin(num_tiles_border = 1):
 			piece.color(SKIN_COLOR)
 			piece.setPosition((columns - 1 + (columns - column)) * unit, 0, row*unit)
 			piece.setScale(-scaling, scaling, scaling)
-	
+
 	#(columns, 0) corner
 	corner_name = getPieceName(columns - 1,0)
 	corner_piece = viz.addChild(corner_name)
@@ -477,7 +596,7 @@ def placePieceSkin(num_tiles_border = 1):
 	corner_piece.color(SKIN_COLOR)
 	corner_piece.setPosition((columns - 1 + 1)*unit, 0, -1*unit)
 	corner_piece.setScale(-scaling, scaling, -scaling)
-	
+
 	#(0, rows) corner
 	corner_name = getPieceName(0, rows - 1)
 	corner_piece = viz.addChild(corner_name)
@@ -494,12 +613,11 @@ def placePieceSkin(num_tiles_border = 1):
 	corner_piece.setPosition((columns - 1 + 1)*unit, 0, (rows - 1 + 1)*unit)
 	corner_piece.setScale(-scaling, scaling, -scaling)
 
-		
+
 #placePieces()
 #placePieceSkin(1) #should be the number of tiles your sight has
 
 placePieces_FlippedConfiguration()
-
 
 ###############################
 #gives readout of which pice you are over
@@ -627,10 +745,12 @@ def printPOSITION ():
 # Nb. set the number lower to print out the pos and rot more often
 vizact.ontimer(1, printPOSITION)
 
+viz.fog(unit, unit+1200)
+
 ######################
 cave = vizcave.Cave()
-cave.setFarPlane(11*scaling)
-cave.setNearPlane(1)
+#cave.setFarPlane(11*scaling)
+#cave.setNearPlane(1)
 vizact.ontimer(0.0,artTrackerUpdate) #as fast as possible!
 
 setCave()
@@ -638,8 +758,8 @@ setCave()
 
 
 #Dustin mucking around below
-cave_origin.setPosition(0,unit/3.0,0);
-#cave_origin.setPosition((columns - 1)*unit, unit/3.0,(rows - 1)*unit);
+cave_origin.setPosition(0,unit/3.0,0)
+#cave_origin.setPosition((columns - 1)*unit, unit/3.0,(rows - 1)*unit)
 
 
 
