@@ -353,6 +353,61 @@ def placePieces():
 			piece.setScale( scaling, scaling, scaling )
 			piece.color(0.2,0.8,0.8)
 
+def placePieces_FlippedConfiguration():
+	#draw the map so that it can be continuously flown across.
+	# draws one original copy, and three flipped copies,
+	# all bordered by a 1-tile skin that we aren't meant to fly into.
+	# Dis some serious shit.
+
+	#Layout, with a 2x2 config:
+	# square brackets surround the "true" layout - everything else is flipped
+	# cyrved brackets surround the flyable area.
+	# 2 2 1 1 2 2
+	# 2(2 1[1 2]2
+	# 4(4 3[3 4]4
+	# 4(4 3 3 4)4
+	# 2(2 1 1 2)2
+	# 2 2 1 1 2 2
+
+	#naming layout:
+	# -> x, columns
+	# |  
+	# v  z, rows
+	# 				[flip columns] 	[original]
+	#				[flip both]		[flip rows]
+
+	ALL_COLOR = (0.8,0.2,0.2)
+
+	ORIGINAL_COLOUR = ALL_COLOR
+	FLIP_ROW_COLOUR = (0.2,0.8,0.2)
+	FLIP_COLUMN_COLOUR = (0.2,0.2,0.8)
+	FLIP_BOTH_COLOUR = (0.2,0.8,0.8)
+	SKIN_COLOUR = (0.8,0.8,0.8)
+
+	# draw the flyable area
+	for row in range(rows):
+		for column in range(columns):
+			piece_name = getPieceName(column, row)
+
+			#original
+			piece = viz.addChild(piece_name)
+			PIECES.append(piece)
+			piece.color(ORIGINAL_COLOUR)
+			piece.setPosition(column*unit, 0, row*unit)
+			piece.setScale(scaling, scaling, scaling)
+
+			#flip column
+
+			#flip row
+
+
+			#flip both
+
+	#draw the skin
+
+
+
+
 def placePieceSkin(num_tiles_border = 1):
 	#places a number of tiles around the edge of a single grid, flipped so the boundaries are smooth
 
@@ -439,10 +494,11 @@ def placePieceSkin(num_tiles_border = 1):
 	corner_piece.setPosition((columns - 1 + 1)*unit, 0, (rows - 1 + 1)*unit)
 	corner_piece.setScale(-scaling, scaling, -scaling)
 
+		
+#placePieces()
+#placePieceSkin(1) #should be the number of tiles your sight has
 
-				
-placePieces()
-placePieceSkin(1) #should be the number of tiles your sight has
+placePieces_FlippedConfiguration()
 
 
 ###############################
