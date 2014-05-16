@@ -294,17 +294,32 @@ def artTrackerUpdate():
 	compass.setPosition(cave_origin.getPosition())
 	
 
-MAX_SPEED = 20000.0
-ACCEL_FACTOR = MAX_SPEED/20 # seconds to max speed
-BRAKE_FACTOR = MAX_SPEED/10 # seconds to max speed
-CLIMB_RATE = 30.0
-TURN_RATE = 10.0
-blimp_speed = 0
+#forward speed
+MAX_SPEED = 3500.0
+IDLE_SPEED = MAX_SPEED*0.2
+ACCEL_FACTOR = MAX_SPEED/14 # seconds to max speed
+BRAKE_FACTOR = MAX_SPEED/7 # seconds to stop
+TO_IDLE_FACTOR = MAX_SPEED/30
+blimp_speed = IDLE_SPEED
+
+#climbing
+CLIMB_ACCEL_RATE = 10.0
+climb_speed = 0
+CLIMB_DAMPING = 1
+CLIMB_PITCH_FACTOR = 0.3
+
+#turning
+TURN_ACCEL_RATE = 0.3
+turn_speed = 0
+TURN_DAMPING = 1
+ROLL_FACTOR = 300.0
 
 def steeringWheel():
 	#move the cave_origin around based on the steering wheel
 	global SPEED_FACTOR
 	global blimp_speed
+	global climb_speed
+	global turn_speed
 	
 	elapsed = viz.elapsed()
 
@@ -319,23 +334,64 @@ def steeringWheel():
 	if abs(pedal_actuation) < 0.15:
 		pedal_actuation = 0
 	
-	
-	#rotation
-	eul = cave_origin.getEuler()
-	#eul[0] += wheel_turn*TURN_RATE*elapsed
-	#cave_origin.setEuler(eul, viz.ABS_GLOBAL)
-	cave_origin.setEuler(wheel_turn*TURN_RATE*elapsed, 0, 0, viz.REL_LOCAL)
-	
 	#forward thrust
-	if left_finger_trigger:
-		blimp_speed = min(blimp_speed + ACCEL_FACTOR*viz.elapsed(), MAX_SPEED)
 	if right_finger_trigger:
 		blimp_speed = max(0, blimp_speed - BRAKE_FACTOR*viz.elapsed())
-	
+	elif left_finger_trigger:
+		blimp_speed = min(blimp_speed + ACCEL_FACTOR*viz.elapsed(), MAX_SPEED)
+	else: 
+		#no finger trigger touched, seek idle speed
+		to_idle_amount = TO_IDLE_FACTOR*elapsed
+		if abs(IDLE_SPEED - blimp_speed) < to_idle_amount:
+			blimp_speed = IDLE_SPEED
+		elif IDLE_SPEED > blimp_speed:
+			blimp_speed += to_idle_amount
+		else:
+			blimp_speed -= to_idle_amount
+		
 	cave_origin.setPosition(0, 0, blimp_speed*elapsed, viz.REL_LOCAL) 
 	
-	#elevation
-	cave_origin.setPosition(0, pedal_actuation*CLIMB_RATE, 0, viz.REL_LOCAL) 
+	#climb & elevation
+	climb_speed += CLIMB_ACCEL_RATE*elapsed*pedal_actuation
+	climb_speed *= (1 - CLIMB_DAMPING*elapsed)
+	cave_origin.setPosition(0, climb_speed, 0, viz.REL_LOCAL) 
+	
+	#rotation
+	# yaw, pitch, roll
+	# yaw is controlled by steering
+	# bank or roll happens when we're steering and moving fast
+	# pitch happens when we're ascending or descending.
+	
+	turn_speed += TURN_ACCEL_RATE*elapsed*wheel_turn
+	turn_speed *= (1 - TURN_DAMPING*elapsed)
+	
+	cave_origin.setEuler(turn_speed, 0, 0, viz.REL_LOCAL)
+	eul = cave_origin.getEuler()
+	
+	#climbing pitch
+	eul[1] = -climb_speed*CLIMB_PITCH_FACTOR
+	
+	#banking roll
+	eul[2] = -turn_speed*blimp_speed/MAX_SPEED*ROLL_FACTOR
+	
+	cave_origin.setEuler(eul)
+	
+	#banking
+	#    un-bank first
+	#eul = viz.MainView.getEuler()
+	#eul[2] = 0
+	#viz.MainView.setEuler(eul, viz.HEAD_ORI, viz.ABS_GLOBAL)
+
+#    turn
+	#viz.MainView.setAxisAngle(0,1,0,turn_rate,viz.HEAD_ORI,viz.REL_LOCAL)
+	#eul = viz.MainView.getEuler()
+	
+#    bank
+	#eul[2] = -wheel_turn*10
+	#viz.MainView.setEuler(eul, viz.HEAD_ORI, viz.ABS_GLOBAL)
+	
+	
+	
 	
 
 		
@@ -884,7 +940,7 @@ setCave()
 
 
 #Dustin mucking around below
-cave_origin.setPosition(0,unit/3.0,0)
+cave_origin.setPosition(0,unit/4.0,0)
 #cave_origin.setPosition((columns - 1)*unit, unit/3.0,(rows - 1)*unit)
 
 
