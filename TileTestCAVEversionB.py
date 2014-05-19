@@ -238,7 +238,7 @@ def artTrackerUpdate():
 	viewTracker.setEuler(artTracker.yaw,artTracker.pitch,artTracker.roll)
 	
 	cave_origin.setPosition(artTracker.jy*artTracker.x2*fps_speed, artTracker.jy*artTracker.y2*fps_speed, artTracker.jy*artTracker.z2*fps_speed,viz.REL_LOCAL)
-	cave_origin.setEuler(fps_rot_speed*artTracker.jx,0,0,viz.REL_LOCAL)	 
+	cave_origin.setEuler(fps_rot_speed*artTracker.jx,0.0,0.0,viz.REL_LOCAL)	 
 	
 	
 	pos = cave_origin.getPosition()
@@ -255,19 +255,19 @@ def updateVisibilityHive():
 PIECESNAMES=[
 #groups of rows
 
-'TerrainTestsSetof8/GRIDD.IVE',
-'TerrainTestsSetof8/GRIDD.IVE',
-'TerrainTestsSetof8/GRIDD.IVE',
-'TerrainTestsSetof8/GRIDD.IVE',
-'TerrainTestsSetof8/GRIDD.IVE',
-'TerrainTestsSetof8/GRIDD.IVE',
-'TerrainTestsSetof8/GRIDD.IVE',
-'TerrainTestsSetof8/GRIDD.IVE',
-'TerrainTestsSetof8/GRIDD.IVE',
-'TerrainTestsSetof8/GRIDD.IVE',
+'TerrainTestsSetof8/Grid2.OSGB',
+'TerrainTestsSetof8/Grid2.OSGB',
+'TerrainTestsSetof8/Grid2.OSGB',
+'TerrainTestsSetof8/Grid2.OSGB',
+'TerrainTestsSetof8/Grid2.OSGB',
+'TerrainTestsSetof8/Grid2.OSGB',
+'TerrainTestsSetof8/Grid2.OSGB',
+'TerrainTestsSetof8/Grid2.OSGB',
+'TerrainTestsSetof8/Grid2.OSGB',
+'TerrainTestsSetof8/Grid2.OSGB',
 
 
-'TerrainTestsSetof8/GRIDD.IVE',
+'TerrainTestsSetof8/Grid2.OSGB',
 'TerrainTestsSetof8/C1.OSGB',
 'TerrainTestsSetof8/C2.OSGB',
 'TerrainTestsSetof8/C3.OSGB',
@@ -276,9 +276,9 @@ PIECESNAMES=[
 'TerrainTestsSetof8/C6.OSGB',
 'TerrainTestsSetof8/C7.OSGB',
 'TerrainTestsSetof8/C8.OSGB',
-'TerrainTestsSetof8/GRIDD.IVE',
+'TerrainTestsSetof8/Grid2.OSGB',
 
-'TerrainTestsSetof8/GRIDD.IVE',
+'TerrainTestsSetof8/Grid2.OSGB',
 'TerrainTestsSetof8/B13.OSGB',
 'TerrainTestsSetof8/B14.OSGB',
 'TerrainTestsSetof8/B15.OSGB',
@@ -287,9 +287,9 @@ PIECESNAMES=[
 'TerrainTestsSetof8/N.OSGB',
 'TerrainTestsSetof8/O.OSGB',
 'TerrainTestsSetof8/P.OSGB',
-'TerrainTestsSetof8/GRIDD.IVE',
+'TerrainTestsSetof8/Grid2.OSGB',
 
-'TerrainTestsSetof8/GRIDD.IVE',
+'TerrainTestsSetof8/Grid2.OSGB',
 'TerrainTestsSetof8/B9.OSGB',
 'TerrainTestsSetof8/B10.OSGB',
 'TerrainTestsSetof8/B11.OSGB',
@@ -298,9 +298,9 @@ PIECESNAMES=[
 'TerrainTestsSetof8/J.OSGB',
 'TerrainTestsSetof8/K.OSGB',
 'TerrainTestsSetof8/L.OSGB',
-'TerrainTestsSetof8/GRIDD.IVE',
+'TerrainTestsSetof8/Grid2.OSGB',
 
-'TerrainTestsSetof8/GRIDD.IVE',
+'TerrainTestsSetof8/Grid2.OSGB',
 'TerrainTestsSetof8/B5.OSGB',
 'TerrainTestsSetof8/B6.OSGB',
 'TerrainTestsSetof8/B7.OSGB',
@@ -309,9 +309,9 @@ PIECESNAMES=[
 'TerrainTestsSetof8/F.OSGB',
 'TerrainTestsSetof8/G.OSGB',
 'TerrainTestsSetof8/H.OSGB',
-'TerrainTestsSetof8/GRIDD.IVE',
+'TerrainTestsSetof8/Grid2.OSGB',
 
-'TerrainTestsSetof8/GRIDD.IVE',
+'TerrainTestsSetof8/Grid2.OSGB',
 'TerrainTestsSetof8/B1.OSGB',
 'TerrainTestsSetof8/B2.OSGB',
 'TerrainTestsSetof8/B3.OSGB',
@@ -320,9 +320,9 @@ PIECESNAMES=[
 'TerrainTestsSetof8/B.OSGB',
 'TerrainTestsSetof8/C.OSGB',
 'TerrainTestsSetof8/D.OSGB',
-'TerrainTestsSetof8/GRIDD.IVE',
+'TerrainTestsSetof8/Grid2.OSGB',
 
-'TerrainTestsSetof8/GRIDD.IVE',
+'TerrainTestsSetof8/Grid2.OSGB',
 'TerrainTestsSetof8/G00.OSGB',
 'TerrainTestsSetof8/G10.OSGB',
 'TerrainTestsSetof8/G20.OSGB',
@@ -331,9 +331,9 @@ PIECESNAMES=[
 'TerrainTestsSetof8/S02.OSGB',
 'TerrainTestsSetof8/S03.OSGB',
 'TerrainTestsSetof8/S04.OSGB',
-'TerrainTestsSetof8/GRIDD.IVE',
+'TerrainTestsSetof8/Grid2.OSGB',
 
-'TerrainTestsSetof8/GRIDD.IVE',
+'TerrainTestsSetof8/Grid2.OSGB',
 'TerrainTestsSetof8/G01.OSGB',
 'TerrainTestsSetof8/G11.OSGB',
 'TerrainTestsSetof8/G21.OSGB',
@@ -342,18 +342,18 @@ PIECESNAMES=[
 'TerrainTestsSetof8/S06.OSGB',
 'TerrainTestsSetof8/S07.OSGB',
 'TerrainTestsSetof8/S08.OSGB',
-'TerrainTestsSetof8/GRIDD.IVE',
+'TerrainTestsSetof8/Grid2.OSGB',
 
-'TerrainTestsSetof8/GRIDD.IVE',
-'TerrainTestsSetof8/GRIDD.IVE',
-'TerrainTestsSetof8/GRIDD.IVE',
-'TerrainTestsSetof8/GRIDD.IVE',
-'TerrainTestsSetof8/GRIDD.IVE',
-'TerrainTestsSetof8/GRIDD.IVE',
-'TerrainTestsSetof8/GRIDD.IVE',
-'TerrainTestsSetof8/GRIDD.IVE',
-'TerrainTestsSetof8/GRIDD.IVE',
-'TerrainTestsSetof8/GRIDD.IVE'
+'TerrainTestsSetof8/Grid2.OSGB',
+'TerrainTestsSetof8/Grid2.OSGB',
+'TerrainTestsSetof8/Grid2.OSGB',
+'TerrainTestsSetof8/Grid2.OSGB',
+'TerrainTestsSetof8/Grid2.OSGB',
+'TerrainTestsSetof8/Grid2.OSGB',
+'TerrainTestsSetof8/Grid2.OSGB',
+'TerrainTestsSetof8/Grid2.OSGB',
+'TerrainTestsSetof8/Grid2.OSGB',
+'TerrainTestsSetof8/Grid2.OSGB'
 ]
 
 ################################
@@ -504,6 +504,9 @@ def printPOSITION ():
 # Nb. set the number lower to print out the pos and rot more often
 vizact.ontimer(1, printPOSITION)
 
+#controls
+WHEEL_DEAD_ZONE = 0.05
+PEDAL_DEAD_ZONE = 0.15
 
 #forward speed
 MAX_SPEED = 3000.0
@@ -525,25 +528,73 @@ turn_speed = 0
 TURN_DAMPING = 1
 ROLL_FACTOR = 300.0
 
+#autopilot
+AUTOPILOT_WAIT_TIME = 180 #seconds
+dead_control_time = 0
+AUTOPILOT_WHEEL_TURN_AMOUNT = 0.1
+AUTOPILOT_PEDAL_ACTIVATION = 0.3
+
+#autopilot to pos is a nice blank tile
+AUTOPILOT_TO_POS = (4.5* unit, unit*0.01, 5.5*unit)
+
 def steeringWheel():
 	#move the cave_origin around based on the steering wheel
 	global SPEED_FACTOR
 	global blimp_speed
 	global climb_speed
 	global turn_speed
+	global dead_control_time
 	
 	elapsed = viz.elapsed()
 
-	pos = joy.getPosition()
-	wheel_turn = pos[0]
-	pedal_actuation = pos[1]
-	
+	#get control values
+	joy_pos = joy.getPosition()
+	wheel_turn = joy_pos[0]
+	pedal_actuation = joy_pos[1]
 	left_finger_trigger = joy.isButtonDown(1)
 	right_finger_trigger = joy.isButtonDown(2)
 	
 	#dead zones
-	if abs(pedal_actuation) < 0.15:
+	if abs(pedal_actuation) < PEDAL_DEAD_ZONE:
 		pedal_actuation = 0
+	if abs(wheel_turn) < WHEEL_DEAD_ZONE:
+		wheel_turn = 0
+		
+	controls_dead = (not left_finger_trigger) and (not right_finger_trigger) and \
+		(pedal_actuation == 0) and (wheel_turn == 0)
+	
+	if controls_dead:
+		dead_control_time += elapsed
+	else:
+		dead_control_time = 0
+	if dead_control_time >= AUTOPILOT_WAIT_TIME:
+		#running on autopilot
+		
+		cave_pos = cave_origin.getPosition()
+		cave_eul = cave_origin.getEuler()
+		
+		#elevation
+		if cave_pos[1] < AUTOPILOT_TO_POS[1]:
+			pedal_actuation = AUTOPILOT_PEDAL_ACTIVATION
+		else:
+			pedal_actuation = -AUTOPILOT_PEDAL_ACTIVATION
+			
+		#turning to centre, if near edge
+		near_edge = cave_pos[0] < unit or cave_pos[0] > (columns - 2)*unit or \
+			cave_pos[2] < unit or cave_pos[2] > (rows - 2)*unit
+		
+		if near_edge:
+			#turn towards centre
+			
+			yaw = cave_eul[0]			
+			
+			#vector math. May be erroneous
+			goal_yaw = 180.0/(math.pi)*math.atan2(AUTOPILOT_TO_POS[2] - cave_pos[2], AUTOPILOT_TO_POS[0] - cave_pos[0])
+			
+			if yaw < goal_yaw:
+				wheel_turn = AUTOPILOT_WHEEL_TURN_AMOUNT
+			else:
+				wheel_turn = -AUTOPILOT_WHEEL_TURN_AMOUNT
 	
 	#forward thrust
 	if right_finger_trigger:
@@ -615,6 +666,5 @@ setCave()
 #######################
 
 #set blimp to start in the middle of the map
-cave_origin.setPosition(rows/2 * unit, unit*0.01, columns/2*unit)
-
+cave_origin.setPosition(AUTOPILOT_TO_POS)
 
