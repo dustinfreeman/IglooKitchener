@@ -521,6 +521,8 @@ CLIMB_ACCEL_RATE = 1.0
 climb_speed = 0
 CLIMB_DAMPING = 1
 CLIMB_PITCH_FACTOR = 0.3
+CLIMB_LOWER_LIMIT = -unit*0.05
+CLIMB_UPPER_LIMIT = unit
 
 #turning
 TURN_ACCEL_RATE = 0.3
@@ -528,14 +530,16 @@ turn_speed = 0
 TURN_DAMPING = 1
 ROLL_FACTOR = 300.0
 
+#autopilot to pos is a nice blank tile
+AUTOPILOT_TO_POS = (4.5* unit, unit*0.01, 5.5*unit)
+
 #autopilot
 AUTOPILOT_WAIT_TIME = 180 #seconds
 dead_control_time = 0
 AUTOPILOT_WHEEL_TURN_AMOUNT = 0.1
 AUTOPILOT_PEDAL_ACTIVATION = 0.3
-
-#autopilot to pos is a nice blank tile
-AUTOPILOT_TO_POS = (4.5* unit, unit*0.01, 5.5*unit)
+AUTOPILOT_TURN_DEADZONE = 5
+AUTOPILOT_CLIMB_DEADZONE = unit*0.001
 
 def steeringWheel():
 	#move the cave_origin around based on the steering wheel
@@ -546,6 +550,9 @@ def steeringWheel():
 	global dead_control_time
 	
 	elapsed = viz.elapsed()
+	
+	cave_pos = cave_origin.getPosition()
+	cave_eul = cave_origin.getEuler()
 
 	#get control values
 	joy_pos = joy.getPosition()
@@ -570,14 +577,12 @@ def steeringWheel():
 	if dead_control_time >= AUTOPILOT_WAIT_TIME:
 		#running on autopilot
 		
-		cave_pos = cave_origin.getPosition()
-		cave_eul = cave_origin.getEuler()
-		
 		#elevation
-		if cave_pos[1] < AUTOPILOT_TO_POS[1]:
-			pedal_actuation = AUTOPILOT_PEDAL_ACTIVATION
-		else:
-			pedal_actuation = -AUTOPILOT_PEDAL_ACTIVATION
+		if abs(AUTOPILOT_TO_POS[1] - cave_pos[1]) > AUTOPILOT_CLIMB_DEADZONE:
+			if cave_pos[1] < AUTOPILOT_TO_POS[1]:
+				pedal_actuation = AUTOPILOT_PEDAL_ACTIVATION
+			else:
+				pedal_actuation = -AUTOPILOT_PEDAL_ACTIVATION
 			
 		#turning to centre, if near edge
 		near_edge = cave_pos[0] < unit or cave_pos[0] > (columns - 2)*unit or \
@@ -585,16 +590,14 @@ def steeringWheel():
 		
 		if near_edge:
 			#turn towards centre
-			
 			yaw = cave_eul[0]			
-			
-			#vector math. May be erroneous
 			goal_yaw = 180.0/(math.pi)*math.atan2(AUTOPILOT_TO_POS[0] - cave_pos[0], AUTOPILOT_TO_POS[2] - cave_pos[2])
 			
-			if yaw < goal_yaw:
-				wheel_turn = AUTOPILOT_WHEEL_TURN_AMOUNT
-			else:
-				wheel_turn = -AUTOPILOT_WHEEL_TURN_AMOUNT
+			if abs(goal_yaw - yaw) > AUTOPILOT_TURN_DEADZONE:
+				if yaw < goal_yaw:
+					wheel_turn = AUTOPILOT_WHEEL_TURN_AMOUNT
+				else:
+					wheel_turn = -AUTOPILOT_WHEEL_TURN_AMOUNT
 	
 	#forward thrust
 	if right_finger_trigger:
@@ -615,10 +618,18 @@ def steeringWheel():
 	
 	
 	#climb & elevation
+	#height limits
+	if cave_pos[1] < CLIMB_LOWER_LIMIT:
+		pedal_actuation = +1
+	elif cave_pos[1] > CLIMB_UPPER_LIMIT:
+		pedal_actuation = -1
+	
 	climb_speed += CLIMB_ACCEL_RATE*elapsed*pedal_actuation
 	climb_speed *= (1 - CLIMB_DAMPING*elapsed)
 	cave_origin.setPosition(0, climb_speed, 0, viz.REL_LOCAL) 
+	
 	compass.setPosition(cave_origin.getPosition())
+	
 	#rotation
 	# yaw, pitch, roll
 	# yaw is controlled by steering
