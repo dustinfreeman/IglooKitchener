@@ -589,7 +589,7 @@ def steeringWheel():
 			yaw = cave_eul[0]			
 			
 			#vector math. May be erroneous
-			goal_yaw = 180.0/(math.pi)*math.atan2(AUTOPILOT_TO_POS[2] - cave_pos[2], AUTOPILOT_TO_POS[0] - cave_pos[0])
+			goal_yaw = 180.0/(math.pi)*math.atan2(AUTOPILOT_TO_POS[0] - cave_pos[0], AUTOPILOT_TO_POS[2] - cave_pos[2])
 			
 			if yaw < goal_yaw:
 				wheel_turn = AUTOPILOT_WHEEL_TURN_AMOUNT
