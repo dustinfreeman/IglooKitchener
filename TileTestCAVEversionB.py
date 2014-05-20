@@ -16,6 +16,11 @@ joy = vizjoy.add()
 #get Zepplin
 import Zeppelin
 from Zeppelin import ZEP
+
+import Logo
+from Logo import Logo
+
+
 #####################
 #setup CAVE
 viz.multiSample = 4
@@ -24,7 +29,7 @@ polyMode = viz.POLY_WIRE
 #viz.setMultiSample(config.multiSample) seems to give this error message
 viz.window.setPolyMode(viz.POLY_WIRE)
 viz.MainWindow.fov(50)
-viz.vsync(0)#this may increase frame rate but may get tears
+viz.vsync(viz.ON)#this may increase frame rate but may get tears
 speed = 22000 # move speed
 
 compass = viz.addChild('Meshes/arrow.osgb')
@@ -231,19 +236,14 @@ def artTrackerUpdate():
 	fps_rot_speed = elapsed*rot_speed
 	
 	if GO_FAST:
-		fps_speed *= 10
-		fps_rot_speed *= 5
+		fps_speed *= 10.0
+		fps_rot_speed *= 5.0
 	
 	viewTracker.setPosition(artTracker.x,artTracker.y,artTracker.z+depth/2)
 	viewTracker.setEuler(artTracker.yaw,artTracker.pitch,artTracker.roll)
 	
 	cave_origin.setPosition(artTracker.jy*artTracker.x2*fps_speed, artTracker.jy*artTracker.y2*fps_speed, artTracker.jy*artTracker.z2*fps_speed,viz.REL_LOCAL)
 	cave_origin.setEuler(fps_rot_speed*artTracker.jx,0.0,0.0,viz.REL_LOCAL)	 
-	
-	
-	pos = cave_origin.getPosition()
-	eul = cave_origin.getEuler()
-	
 	
 	
 def updateVisibilityHive():
@@ -466,7 +466,7 @@ def printPOSITION ():
 	ToIce = ICESHEET - WhereAmIVect
 	distanceToIce = ToIce.length()
 	
-	
+
 	#print "distanceTOZEP = "
 	#print distance
 	
@@ -517,10 +517,10 @@ TO_IDLE_FACTOR = MAX_SPEED/30
 blimp_speed = IDLE_SPEED
 
 #climbing
-CLIMB_ACCEL_RATE = 1.0
+CLIMB_ACCEL_RATE = 2.0
 climb_speed = 0
 CLIMB_DAMPING = 1
-CLIMB_PITCH_FACTOR = 0.3
+CLIMB_PITCH_FACTOR = 3.0
 CLIMB_LOWER_LIMIT = -unit*0.05
 CLIMB_UPPER_LIMIT = unit
 
@@ -535,11 +535,15 @@ AUTOPILOT_TO_POS = (4.5* unit, unit*0.01, 5.5*unit)
 
 #autopilot
 AUTOPILOT_WAIT_TIME = 180 #seconds
-dead_control_time = 0
+dead_control_time = AUTOPILOT_WAIT_TIME #start in autopilot
+live_control_time = 0 #time someone has been flying it.
 AUTOPILOT_WHEEL_TURN_AMOUNT = 0.1
 AUTOPILOT_PEDAL_ACTIVATION = 0.3
 AUTOPILOT_TURN_DEADZONE = 5
 AUTOPILOT_CLIMB_DEADZONE = unit*0.001
+
+#compass
+COMPASS_EUL = (0.0, 0.0, 0)
 
 def steeringWheel():
 	#move the cave_origin around based on the steering wheel
@@ -548,6 +552,7 @@ def steeringWheel():
 	global climb_speed
 	global turn_speed
 	global dead_control_time
+	global live_control_time
 	
 	elapsed = viz.elapsed()
 	
@@ -572,10 +577,15 @@ def steeringWheel():
 	
 	if controls_dead:
 		dead_control_time += elapsed
-	else:
+	else: #controls are live
 		dead_control_time = 0
-	if dead_control_time >= AUTOPILOT_WAIT_TIME:
+		
+	if dead_control_time < AUTOPILOT_WAIT_TIME:
+		# controls are "live"
+		live_control_time += elapsed	
+	else:
 		#running on autopilot
+		live_control_time = 0
 		
 		#elevation
 		if abs(AUTOPILOT_TO_POS[1] - cave_pos[1]) > AUTOPILOT_CLIMB_DEADZONE:
@@ -628,7 +638,11 @@ def steeringWheel():
 	climb_speed *= (1 - CLIMB_DAMPING*elapsed)
 	cave_origin.setPosition(0, climb_speed, 0, viz.REL_LOCAL) 
 	
-	compass.setPosition(cave_origin.getPosition())
+	#set it so compass does not yaw
+	#compass_eul = compass.getEuler()
+	#compass_eul[0] = -cave_eul[0]
+	#compass.setEuler(compass_eul)
+	compass.setEuler(-cave_eul[0], COMPASS_EUL[1], COMPASS_EUL[2])
 	
 	#rotation
 	# yaw, pitch, roll
@@ -663,7 +677,33 @@ def steeringWheel():
 #    bank
 	#eul[2] = -wheel_turn*10
 	#viz.MainView.setEuler(eul, viz.HEAD_ORI, viz.ABS_GLOBAL)
+
+######################
+
+FADE_TIME = 7.5
+LOGO_DISTANCE = 400
+LOGO_FADE_TO_SPOT = -1000
+def FadeLogoCheck():	
+	#when user starts flying, logo should fade and fly away
+	# once autopilot starts, the logo should fade and fly in.
 	
+	if dead_control_time >= AUTOPILOT_WAIT_TIME:
+		#autopilot
+		time_over = dead_control_time - AUTOPILOT_WAIT_TIME
+		time_over = min(time_over, FADE_TIME)
+		
+		fade_amount = time_over/FADE_TIME
+		
+		Logo.setPosition(0,0,fade_amount*(LOGO_DISTANCE - LOGO_FADE_TO_SPOT) + LOGO_FADE_TO_SPOT)				
+		
+	else: 
+		#positioning logo fade back.
+		
+		fade_amount = live_control_time/FADE_TIME
+		fade_amount = min(1, fade_amount)
+		
+		Logo.setPosition(0,0,(1.0 - fade_amount)*(LOGO_DISTANCE - LOGO_FADE_TO_SPOT) + LOGO_FADE_TO_SPOT)
+		
 
 ######################
 #unit = tile size
@@ -674,6 +714,14 @@ cave.setFarPlane(0.95*unit)##needs the farplane to have compass
 vizact.ontimer(0.0,artTrackerUpdate) #as fast as possible!
 vizact.ontimer(0.0,steeringWheel)
 setCave()
+
+Logo.setParent(cave_origin)
+Logo.setPosition(0,0,LOGO_DISTANCE)
+vizact.ontimer(0.0,FadeLogoCheck)
+
+compass.setParent(cave_origin)
+compass.setPosition(0, -5, 10)
+compass.setScale(6, 6, 6)
 #######################
 
 #set blimp to start in the middle of the map
