@@ -532,7 +532,8 @@ TURN_DAMPING = 1
 ROLL_FACTOR = 300.0
 
 #autopilot to pos is a nice blank tile
-AUTOPILOT_TO_POS = (4.5* unit, unit*0.01, 5.5*unit)
+def AUTOPILOT_TO_POS():
+	return ( (rows/2 + 0.5)* unit, unit*0.01, (columns/2 + 0.5)*unit)
 
 #autopilot
 AUTOPILOT_WAIT_TIME = 180 #seconds
@@ -576,7 +577,7 @@ def FadeLogoCheck():
 		
 #set blimp to start in the middle of the map
 def to_start_location():
-	cave_origin.setPosition(AUTOPILOT_TO_POS)
+	cave_origin.setPosition(AUTOPILOT_TO_POS())
 	cave_origin.setEuler(35,0,0)
 	
 	dead_control_time = AUTOPILOT_WAIT_TIME + FADE_TIME
@@ -641,8 +642,8 @@ def steeringWheel():
 		live_control_time = 0
 		
 		#elevation
-		if abs(AUTOPILOT_TO_POS[1] - cave_pos[1]) > AUTOPILOT_CLIMB_DEADZONE:
-			if cave_pos[1] < AUTOPILOT_TO_POS[1]:
+		if abs(AUTOPILOT_TO_POS()[1] - cave_pos[1]) > AUTOPILOT_CLIMB_DEADZONE:
+			if cave_pos[1] < AUTOPILOT_TO_POS()[1]:
 				pedal_actuation = AUTOPILOT_PEDAL_ACTIVATION
 			else:
 				pedal_actuation = -AUTOPILOT_PEDAL_ACTIVATION
@@ -657,7 +658,7 @@ def steeringWheel():
 		
 		if near_edge:
 			#turn towards centre
-			goal_yaw = 180.0/(math.pi)*math.atan2(AUTOPILOT_TO_POS[0] - cave_pos[0], AUTOPILOT_TO_POS[2] - cave_pos[2])
+			goal_yaw = 180.0/(math.pi)*math.atan2(AUTOPILOT_TO_POS()[0] - cave_pos[0], AUTOPILOT_TO_POS()[2] - cave_pos[2])
 			
 			if abs(goal_yaw - yaw) > AUTOPILOT_TURN_DEADZONE:
 				if yaw < goal_yaw:
