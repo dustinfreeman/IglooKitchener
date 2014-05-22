@@ -542,9 +542,45 @@ AUTOPILOT_WHEEL_TURN_AMOUNT = 0.1
 AUTOPILOT_PEDAL_ACTIVATION = 0.3
 AUTOPILOT_TURN_DEADZONE = 5
 AUTOPILOT_CLIMB_DEADZONE = unit*0.001
+VERBOSE_AUTOPILOT = False
 
 #compass
 COMPASS_EUL = (0.0, 0.0, 0)
+
+FADE_TIME = 7.5
+LOGO_DISTANCE = 400
+LOGO_FADE_TO_SPOT = -1000
+
+
+def FadeLogoCheck():	
+	#when user starts flying, logo should fade and fly away
+	# once autopilot starts, the logo should fade and fly in.
+	
+	if dead_control_time >= AUTOPILOT_WAIT_TIME:
+		#autopilot
+		time_over = dead_control_time - AUTOPILOT_WAIT_TIME
+		time_over = min(time_over, FADE_TIME)
+		
+		fade_amount = time_over/FADE_TIME
+		
+		Logo.setPosition(0,0,fade_amount*(LOGO_DISTANCE - LOGO_FADE_TO_SPOT) + LOGO_FADE_TO_SPOT)				
+		
+	else: 
+		#positioning logo fade back.
+		
+		fade_amount = live_control_time/FADE_TIME
+		fade_amount = min(1, fade_amount)
+		
+		Logo.setPosition(0,0,(1.0 - fade_amount)*(LOGO_DISTANCE - LOGO_FADE_TO_SPOT) + LOGO_FADE_TO_SPOT)
+	
+		
+#set blimp to start in the middle of the map
+def to_start_location():
+	cave_origin.setPosition(AUTOPILOT_TO_POS)
+	cave_origin.setEuler(35,0,0)
+	
+	dead_control_time = AUTOPILOT_WAIT_TIME + FADE_TIME
+
 
 def steeringWheel():
 	#move the cave_origin around based on the steering wheel
@@ -599,6 +635,9 @@ def steeringWheel():
 		live_control_time += elapsed	
 	else:
 		#running on autopilot
+		if VERBOSE_AUTOPILOT:
+			print "autopilot at: " + str(cave_pos)
+		
 		live_control_time = 0
 		
 		#elevation
@@ -612,9 +651,12 @@ def steeringWheel():
 		near_edge = cave_pos[0] < unit or cave_pos[0] > (columns - 2)*unit or \
 			cave_pos[2] < unit or cave_pos[2] > (rows - 2)*unit
 		
+		
+		yaw = cave_eul[0]	
+		goal_yaw = yaw
+		
 		if near_edge:
 			#turn towards centre
-			yaw = cave_eul[0]			
 			goal_yaw = 180.0/(math.pi)*math.atan2(AUTOPILOT_TO_POS[0] - cave_pos[0], AUTOPILOT_TO_POS[2] - cave_pos[2])
 			
 			if abs(goal_yaw - yaw) > AUTOPILOT_TURN_DEADZONE:
@@ -622,6 +664,12 @@ def steeringWheel():
 					wheel_turn = AUTOPILOT_WHEEL_TURN_AMOUNT
 				else:
 					wheel_turn = -AUTOPILOT_WHEEL_TURN_AMOUNT
+			
+		if VERBOSE_AUTOPILOT:
+			print "\t yaw: " + str(yaw) + " goal yaw: " + str(goal_yaw) + " " ,
+					
+		if VERBOSE_AUTOPILOT:
+			print ""
 	
 	#forward thrust
 	if right_finger_trigger:
@@ -640,7 +688,6 @@ def steeringWheel():
 		
 	cave_origin.setPosition(0, 0, blimp_speed*elapsed, viz.REL_LOCAL) 
 	
-	
 	#climb & elevation
 	#height limits
 	if cave_pos[1] < CLIMB_LOWER_LIMIT:
@@ -653,9 +700,6 @@ def steeringWheel():
 	cave_origin.setPosition(0, climb_speed, 0, viz.REL_LOCAL) 
 	
 	#set it so compass does not yaw
-	#compass_eul = compass.getEuler()
-	#compass_eul[0] = -cave_eul[0]
-	#compass.setEuler(compass_eul)
 	compass.setEuler(-cave_eul[0], COMPASS_EUL[1], COMPASS_EUL[2])
 	
 	#rotation
@@ -678,53 +722,15 @@ def steeringWheel():
 	
 	cave_origin.setEuler(eul)
 	
-	#banking
-	#    un-bank first
-	#eul = viz.MainView.getEuler()
-	#eul[2] = 0
-	#viz.MainView.setEuler(eul, viz.HEAD_ORI, viz.ABS_GLOBAL)
-
-#    turn
-	#viz.MainView.setAxisAngle(0,1,0,turn_rate,viz.HEAD_ORI,viz.REL_LOCAL)
-	#eul = viz.MainView.getEuler()
-	
-#    bank
-	#eul[2] = -wheel_turn*10
-	#viz.MainView.setEuler(eul, viz.HEAD_ORI, viz.ABS_GLOBAL)
+	#safety bounds check
+	cave_pos = cave_origin.getPosition()
+	if cave_pos[0] < -unit*0.5 or cave_pos[0] > unit*(columns - 1 + 0.5) or\
+		cave_pos[1] < -unit*0.5 or cave_pos[1] > unit*1.0 or\
+		cave_pos[2] < -unit*0.5 or cave_pos[2] > unit*(rows - 1  + 0.5):
+		print "out of bounds reset"
+		to_start_location()
 
 ######################
-
-FADE_TIME = 7.5
-LOGO_DISTANCE = 400
-LOGO_FADE_TO_SPOT = -1000
-def FadeLogoCheck():	
-	#when user starts flying, logo should fade and fly away
-	# once autopilot starts, the logo should fade and fly in.
-	
-	if dead_control_time >= AUTOPILOT_WAIT_TIME:
-		#autopilot
-		time_over = dead_control_time - AUTOPILOT_WAIT_TIME
-		time_over = min(time_over, FADE_TIME)
-		
-		fade_amount = time_over/FADE_TIME
-		
-		Logo.setPosition(0,0,fade_amount*(LOGO_DISTANCE - LOGO_FADE_TO_SPOT) + LOGO_FADE_TO_SPOT)				
-		
-	else: 
-		#positioning logo fade back.
-		
-		fade_amount = live_control_time/FADE_TIME
-		fade_amount = min(1, fade_amount)
-		
-		Logo.setPosition(0,0,(1.0 - fade_amount)*(LOGO_DISTANCE - LOGO_FADE_TO_SPOT) + LOGO_FADE_TO_SPOT)
-		
-#set blimp to start in the middle of the map
-def to_start_location():
-	cave_origin.setPosition(AUTOPILOT_TO_POS)
-	cave_origin.setEuler(35,0,0)
-	
-	dead_control_time = AUTOPILOT_WAIT_TIME + FADE_TIME
-
 
 def onKeyDown(key): 
     if key == 'r': 
