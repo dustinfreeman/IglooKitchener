@@ -227,7 +227,7 @@ def setCave():
 
 #def trackingEnable():
 #	artTracker.enable
-#		
+
 
 def artTrackerUpdate():
 	
@@ -371,18 +371,14 @@ def placePieces():
 	for piece in PIECES:
 			piece.setPosition(curCol * unit, 0 ,curRow * unit)
 			piece.color(0.2,0.8,0.8)
+			piece.setScale( scaling, scaling, scaling )
+			
 			curCol = curCol + 1
 			if curCol == columns:
 				curCol = 0
 				curRow = curRow + 1
 				
 placePieces()
-
-def setScaling(): #Maybe dont use this until the unit thing is figured out for good
-	for piece in PIECES:
-		piece.setScale( scaling, scaling, scaling )
-		
-setScaling()
 
 ###############################
 #gives readout of which pice you are over
@@ -736,7 +732,7 @@ breath_time = 0
 BREATH_DURATION = 10.0
 BREATH_AMPLITUDE = 0.1
 
-BREATHING = True
+BREATHING = False
 
 def breathe():
 	#makes the pieces breathe
@@ -764,6 +760,16 @@ def breathe():
 		curr_scale = piece.getScale()
 		curr_scale[1] = vertical_scale
 		piece.setScale(curr_scale)
+
+######################
+#Piece sliding motion
+
+#set up secondary pieces
+#TODO: override LandVisible() calls to alpha
+
+#looping call for sliding motion
+
+#control calls
 
 ######################
 
