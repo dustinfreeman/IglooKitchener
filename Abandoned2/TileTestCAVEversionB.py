@@ -730,6 +730,40 @@ def steeringWheel():
 		print "out of bounds reset"
 		to_start_location()
 
+###############################
+breath_time = 0
+BREATH_DURATION = 10.0
+BREATH_AMPLITUDE = 0.1
+
+BREATHING = True
+
+def breathe():
+	#makes the pieces breathe
+	if not BREATHING:
+		return
+	
+	global breath_time
+	global BREATH_DURATION
+	global BREATH_AMPLITUDE
+	
+	elapsed = viz.elapsed()
+	breath_time += elapsed
+	
+	#print ("breathing: " + str(vertical_scale))
+	
+	piece_count = 0
+	for piece in PIECES:
+		#per-piece phasing
+		piece_phase = 0 # 1 == 0
+		piece_phase = piece_count/5.0
+		piece_count += 1
+		
+		vertical_scale = scaling + BREATH_AMPLITUDE*scaling*math.sin(((breath_time + piece_phase)/BREATH_DURATION)*2*math.pi)
+		
+		curr_scale = piece.getScale()
+		curr_scale[1] = vertical_scale
+		piece.setScale(curr_scale)
+
 ######################
 
 def onKeyDown(key): 
@@ -748,6 +782,7 @@ cave.setFarPlane(0.95*unit)##needs the farplane to have compass
 #cave.setNearPlane(0.1)
 vizact.ontimer(0.0,artTrackerUpdate) #as fast as possible!
 vizact.ontimer(0.0,steeringWheel)
+vizact.ontimer(0.03,breathe)
 setCave()
 
 Logo.setParent(cave_origin)
