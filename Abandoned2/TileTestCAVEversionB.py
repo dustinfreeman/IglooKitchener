@@ -727,14 +727,14 @@ def steeringWheel():
 		if throttle > 0:
 			thrust_accel += throttle*ACCEL_FACTOR*elapsed
 		else: #throttle < 0
-			thrust_accel -= throttle*BRAKE_FACTOR*elapsed
+			thrust_accel += throttle*BRAKE_FACTOR*elapsed
 
 	blimp_speed += thrust_accel
 	#bounding
 	blimp_speed = max(0, blimp_speed)
 	blimp_speed = min(MAX_SPEED, blimp_speed)
 	
-	print "throttle " + str(throttle) + " thrust_accel " + str(thrust_accel) + " blimp_speed " + str(blimp_speed)
+	#print "throttle " + str(throttle) + " thrust_accel " + str(thrust_accel) + " blimp_speed " + str(blimp_speed)
 		
 	cave_origin.setPosition(0, 0, blimp_speed*elapsed, viz.REL_LOCAL) 
 	
