@@ -520,6 +520,11 @@ CLIMB_PITCH_FACTOR = 3.0
 CLIMB_LOWER_LIMIT = -unit*0.05
 CLIMB_UPPER_LIMIT = unit
 
+#mouse-based climbing control
+CLIMB_CONTROL_LEVER = True
+CLIMBING_CONTROL_SCALE = 150.0
+climb_control_lever = 0
+
 #turning
 TURN_ACCEL_RATE = 30.0
 turn_speed = 0
@@ -549,12 +554,11 @@ AUTOPILOT_CLIMB_DEADZONE = unit*0.001
 VERBOSE_AUTOPILOT = False
 
 #compass
-COMPASS_EUL = (0.0, 0.0, 0)
+COMPASS_EUL = (0.0, 0.0, 0) #for relative usage.
 
 FADE_TIME = 7.5
 LOGO_DISTANCE = 400
 LOGO_FADE_TO_SPOT = -1000
-
 
 def FadeLogoCheck():	
 	#when user starts flying, logo should fade and fly away
@@ -592,43 +596,58 @@ def steeringWheel():
 	global blimp_speed
 	global climb_speed
 	global turn_speed
+	
 	global dead_control_time
 	global live_control_time
+	
 	global turn_queue
+	global climb_control_lever
 	
 	elapsed = viz.elapsed()
 	
 	cave_pos = cave_origin.getPosition()
 	cave_eul = cave_origin.getEuler()
 
-	#get control values
+	#joystick control values
 	joy_pos = joy.getPosition()
 	wheel_turn = joy_pos[0]
-	pedal_actuation = joy_pos[1]
+	climb_actuation = joy_pos[1]
 	left_finger_trigger = joy.isButtonDown(1)
 	right_finger_trigger = joy.isButtonDown(2)
+	#dead zones
+	if abs(climb_actuation) < PEDAL_DEAD_ZONE:
+		climb_actuation = 0
+	if abs(wheel_turn) < WHEEL_DEAD_ZONE:
+		wheel_turn = 0
+		
 	#keyboard controls
 	if viz.key.isDown('a'):
 		wheel_turn = -1
 	if viz.key.isDown('d'):
 		wheel_turn = +1
 	if viz.key.isDown('w'):
-		pedal_actuation = +1
+		climb_actuation = +1
 	if viz.key.isDown('s'):
-		pedal_actuation = -1
+		climb_actuation = -1
 	if viz.key.isDown(viz.KEY_CONTROL_L):
 		right_finger_trigger = True
 	if viz.key.isDown(viz.KEY_SHIFT_L):
 		left_finger_trigger = True
 	
-	#dead zones
-	if abs(pedal_actuation) < PEDAL_DEAD_ZONE:
-		pedal_actuation = 0
-	if abs(wheel_turn) < WHEEL_DEAD_ZONE:
-		wheel_turn = 0
-		
+	if CLIMB_CONTROL_LEVER:
+		climb_actuation = climb_control_lever/CLIMBING_CONTROL_SCALE
+	
+	if QUEUED_TURNING:
+		#turn queued turning into wheel_turn
+		if abs(turn_queue) < QUEUED_TURN_DEAD_ZONE:
+			turn_queue = 0
+		if turn_queue != 0:
+			wheel_turn += math.copysign(min(1, math.pow(abs(turn_queue/QUEUED_TURN_MAX_RATE), 2)), turn_queue)	
+	
+	
+	#AUTOPILOT
 	controls_dead = (not left_finger_trigger) and (not right_finger_trigger) and \
-		(pedal_actuation == 0) and (wheel_turn == 0)
+		(climb_actuation == 0) and (wheel_turn == 0)	
 	
 	if controls_dead:
 		dead_control_time += elapsed
@@ -648,9 +667,9 @@ def steeringWheel():
 		#elevation
 		if abs(AUTOPILOT_TO_POS()[1] - cave_pos[1]) > AUTOPILOT_CLIMB_DEADZONE:
 			if cave_pos[1] < AUTOPILOT_TO_POS()[1]:
-				pedal_actuation = AUTOPILOT_PEDAL_ACTIVATION
+				climb_actuation = AUTOPILOT_PEDAL_ACTIVATION
 			else:
-				pedal_actuation = -AUTOPILOT_PEDAL_ACTIVATION
+				climb_actuation = -AUTOPILOT_PEDAL_ACTIVATION
 			
 		#turning to centre, if near edge
 		near_edge = cave_pos[0] < unit or cave_pos[0] > (columns - 2)*unit or \
@@ -675,13 +694,6 @@ def steeringWheel():
 		if VERBOSE_AUTOPILOT:
 			print ""
 			
-	if QUEUED_TURNING:
-		#turn queued turning into wheel_turn
-		if abs(turn_queue) < QUEUED_TURN_DEAD_ZONE:
-			turn_queue = 0
-		if turn_queue != 0:
-			wheel_turn = math.copysign(min(1, math.pow(abs(turn_queue/QUEUED_TURN_MAX_RATE), 2)), turn_queue)
-	
 	#forward thrust
 	if right_finger_trigger:
 		blimp_speed = max(0, blimp_speed - BRAKE_FACTOR*elapsed)
@@ -702,11 +714,11 @@ def steeringWheel():
 	#climb & elevation
 	#height limits
 	if cave_pos[1] < CLIMB_LOWER_LIMIT:
-		pedal_actuation = +1
+		climb_actuation = +1
 	elif cave_pos[1] > CLIMB_UPPER_LIMIT:
-		pedal_actuation = -1
+		climb_actuation = -1
 	
-	climb_speed += CLIMB_ACCEL_RATE*elapsed*pedal_actuation
+	climb_speed += CLIMB_ACCEL_RATE*elapsed*climb_actuation
 	climb_speed *= (1 - CLIMB_DAMPING*elapsed)
 	cave_origin.setPosition(0, climb_speed, 0, viz.REL_LOCAL) 
 	
@@ -801,6 +813,32 @@ def mouseWheel(direction):
 	turn_queue += QUEUED_TURN_DIRN*direction
 	
 viz.callback(viz.MOUSEWHEEL_EVENT, mouseWheel) 
+
+def onMouseMove(e): 
+#    print e.x, 'is absolute x.' 
+#    print e.y, 'is absolute y.' 
+#    print e.dx, 'is the relative change in x.' 
+#    print e.dy, 'is the relative change y.' 
+
+	global climb_control_lever
+
+	if CLIMB_CONTROL_LEVER:
+		climb_control_lever += e.dy
+
+	pass
+
+viz.callback(viz.MOUSE_MOVE_EVENT,onMouseMove)
+
+#click to reset positions
+def onMouseDown(button): 
+	global turn_queue
+	global climb_control_lever
+	
+	if button == viz.MOUSEBUTTON_LEFT: 
+		turn_queue = 0
+		climb_control_lever = 0
+		
+viz.callback(viz.MOUSEDOWN_EVENT,onMouseDown) 
 
 ######################
 
