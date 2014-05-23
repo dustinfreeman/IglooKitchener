@@ -14,8 +14,7 @@ import vizjoy
 joy = vizjoy.add()
 #####################
 #get Zepplin
-import Zeppelin
-from Zeppelin import ZEP
+from Zeppelin import *
 
 import Logo
 from Logo import Logo
@@ -45,9 +44,9 @@ rot_speed = 17 # rotate speed
 from OSC import OSCClient, OSCMessage 
 #OSCHOST  = "172.16.101.174"
 
-OSCHOST  = "localhost" # On windows supercollider, use port 57121 instead of 57120
+OSCHOST  = "localhost" # On windows supercollider, use port 57121 instead of 57120 or is it 57120
 client = OSCClient()
-client.connect( (OSCHOST, 57121) )
+client.connect( (OSCHOST, 57120) )
 #####################
 def setCave():
 	global cave, height, width, depth
@@ -464,11 +463,11 @@ def printPOSITION ():
 	distanceToIce = ToIce.length()
 	
 
-	#print "distanceTOZEP = "
-	#print distance
+	print "distanceTOZEP = "
+	print distance
 	
-	#print "Altitude = "
-	#print whereAmIy
+	print "Altitude = "
+	print whereAmIy
 
 	#Send along position and rotation via OSC
 	ZPOSmsg = OSCMessage("/ZEPPOSITION")
