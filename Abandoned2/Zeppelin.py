@@ -110,10 +110,10 @@ for x in range(0,10):
 
 
 #this is the magic ZEP that gets its position date to the CAVe so we can get sound thingies
-ZEP = viz.addChild('Meshes/ZepZ.OSGB')
-ZEP.setScale(1260,1260,1260)
-ZEP.alpha(.5)
-setUpZEP(ZEP)
+MAGIC_ZEP = viz.addChild('Meshes/ZepZ.OSGB')
+MAGIC_ZEP.setScale(1260,1260,1260)
+MAGIC_ZEP.alpha(.5)
+setUpZEP(MAGIC_ZEP)
 
 
 
