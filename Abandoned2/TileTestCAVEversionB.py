@@ -463,11 +463,11 @@ def printPOSITION ():
 	distanceToIce = ToIce.length()
 	
 
-	print "distanceTOZEP = "
-	print distance
+	#print "distanceTOZEP = "
+	#print distance
 	
-	print "Altitude = "
-	print whereAmIy
+	#print "Altitude = "
+	#print whereAmIy
 
 	#Send along position and rotation via OSC
 	ZPOSmsg = OSCMessage("/ZEPPOSITION")
@@ -521,10 +521,17 @@ CLIMB_LOWER_LIMIT = -unit*0.05
 CLIMB_UPPER_LIMIT = unit
 
 #turning
-TURN_ACCEL_RATE = 0.3
+TURN_ACCEL_RATE = 10.0
 turn_speed = 0
 TURN_DAMPING = 1
-ROLL_FACTOR = 300.0
+ROLL_FACTOR = 3.0
+
+#QUEUED TURNING - non-realistic wheel control
+QUEUED_TURNING = True
+turn_queue = 0
+QUEUED_WHEEL_TURN_RATE = 0.3
+QUEUED_TURN_DEAD_ZONE = 0.5
+QUEUED_TURN_DIRN = 1
 
 #autopilot to pos is a nice blank tile
 def AUTOPILOT_TO_POS():
@@ -586,6 +593,7 @@ def steeringWheel():
 	global turn_speed
 	global dead_control_time
 	global live_control_time
+	global turn_queue
 	
 	elapsed = viz.elapsed()
 	
@@ -647,7 +655,6 @@ def steeringWheel():
 		near_edge = cave_pos[0] < unit or cave_pos[0] > (columns - 2)*unit or \
 			cave_pos[2] < unit or cave_pos[2] > (rows - 2)*unit
 		
-		
 		yaw = cave_eul[0]	
 		goal_yaw = yaw
 		
@@ -666,6 +673,13 @@ def steeringWheel():
 					
 		if VERBOSE_AUTOPILOT:
 			print ""
+			
+	if QUEUED_TURNING:
+		#turn queued turning into wheel_turn
+		if abs(turn_queue) < QUEUED_TURN_DEAD_ZONE:
+			turn_queue = 0
+		if turn_queue != 0:
+			wheel_turn = math.copysign(min(1, math.sqrt(abs(turn_queue))*QUEUED_WHEEL_TURN_RATE), turn_queue)
 	
 	#forward thrust
 	if right_finger_trigger:
@@ -707,14 +721,20 @@ def steeringWheel():
 	turn_speed += TURN_ACCEL_RATE*elapsed*wheel_turn
 	turn_speed *= (1 - TURN_DAMPING*elapsed)
 	
-	cave_origin.setEuler(turn_speed, 0, 0, viz.REL_LOCAL)
+	#yawing
+	turn_amount = turn_speed*elapsed
+	if QUEUED_TURNING and turn_queue != 0:
+		turn_queue -= turn_amount
+		if turn_queue != 0:
+			print "turn_queue: " + str(turn_queue)
+	cave_origin.setEuler(turn_amount, 0, 0, viz.REL_LOCAL)
 	eul = cave_origin.getEuler()
 	
 	#climbing pitch
 	eul[1] = -climb_speed*CLIMB_PITCH_FACTOR
 	
 	#banking roll
-	eul[2] = -turn_speed*blimp_speed/MAX_SPEED*ROLL_FACTOR
+	eul[2] = -turn_speed*math.sqrt(blimp_speed/MAX_SPEED)*ROLL_FACTOR
 	
 	cave_origin.setEuler(eul)
 	
@@ -769,6 +789,16 @@ def breathe():
 #looping call for sliding motion
 
 #control calls
+
+######################
+#Turn queueing,
+# i.e. bizarro mouse wheel steering wheel behaviour
+def mouseWheel(direction):
+	#print "mouseWheel: " + str(direction)
+	global turn_queue
+	turn_queue += QUEUED_TURN_DIRN*direction
+	
+viz.callback(viz.MOUSEWHEEL_EVENT, mouseWheel) 
 
 ######################
 
