@@ -521,7 +521,7 @@ CLIMB_LOWER_LIMIT = -unit*0.05
 CLIMB_UPPER_LIMIT = unit
 
 #turning
-TURN_ACCEL_RATE = 10.0
+TURN_ACCEL_RATE = 30.0
 turn_speed = 0
 TURN_DAMPING = 1
 ROLL_FACTOR = 3.0
@@ -529,9 +529,10 @@ ROLL_FACTOR = 3.0
 #QUEUED TURNING - non-realistic wheel control
 QUEUED_TURNING = True
 turn_queue = 0
-QUEUED_WHEEL_TURN_RATE = 0.3
+QUEUED_WHEEL_TURN_RATE = 0.7
 QUEUED_TURN_DEAD_ZONE = 0.5
 QUEUED_TURN_DIRN = 1
+QUEUED_TURN_MAX_RATE = 50.0
 
 #autopilot to pos is a nice blank tile
 def AUTOPILOT_TO_POS():
@@ -679,7 +680,7 @@ def steeringWheel():
 		if abs(turn_queue) < QUEUED_TURN_DEAD_ZONE:
 			turn_queue = 0
 		if turn_queue != 0:
-			wheel_turn = math.copysign(min(1, math.sqrt(abs(turn_queue))*QUEUED_WHEEL_TURN_RATE), turn_queue)
+			wheel_turn = math.copysign(min(1, math.pow(abs(turn_queue/QUEUED_TURN_MAX_RATE), 2)), turn_queue)
 	
 	#forward thrust
 	if right_finger_trigger:
@@ -726,7 +727,8 @@ def steeringWheel():
 	if QUEUED_TURNING and turn_queue != 0:
 		turn_queue -= turn_amount
 		if turn_queue != 0:
-			print "turn_queue: " + str(turn_queue)
+			#print "turn_queue: " + str(turn_queue)
+			pass
 	cave_origin.setEuler(turn_amount, 0, 0, viz.REL_LOCAL)
 	eul = cave_origin.getEuler()
 	
