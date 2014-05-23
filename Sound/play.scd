@@ -15,7 +15,7 @@ f = { |msg, time, addr|
 		//distance = msg[1].abs + msg[2].abs + msg[3].abs;
 		distance = msg[1].abs;
 		//"Total pre-distance is: %\n".postf(distance);
-		distance = distance / 1000000;
+		distance = distance / 350000;
 		distanceVolume = 1.0 - distance;
 
 		if (distanceVolume < 0) {
