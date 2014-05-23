@@ -512,6 +512,11 @@ BRAKE_FACTOR = MAX_SPEED/7 # seconds to stop
 TO_IDLE_FACTOR = MAX_SPEED/30
 blimp_speed = IDLE_SPEED
 
+#mouse-based speed control
+SPEED_CONTROL_LEVER = True
+SPEED_CONTOL_SCALE = 150.0
+speed_control_lever = 0
+
 #climbing
 CLIMB_ACCEL_RATE = 2.0
 climb_speed = 0
@@ -635,7 +640,15 @@ def steeringWheel():
 		left_finger_trigger = True
 	
 	if CLIMB_CONTROL_LEVER:
-		climb_actuation = climb_control_lever/CLIMBING_CONTROL_SCALE
+		climb_actuation += climb_control_lever/CLIMBING_CONTROL_SCALE
+	
+	throttle = 0
+	if SPEED_CONTROL_LEVER:
+		if speed_control_lever < 0:
+			throttle += speed_control_lever/SPEED_CONTOL_SCALE
+		else:
+			throttle += speed_control_lever/SPEED_CONTOL_SCALE
+	
 	
 	if QUEUED_TURNING:
 		#turn queued turning into wheel_turn
@@ -695,19 +708,33 @@ def steeringWheel():
 			print ""
 			
 	#forward thrust
+	thrust_accel = 0
 	if right_finger_trigger:
-		blimp_speed = max(0, blimp_speed - BRAKE_FACTOR*elapsed)
+		thrust_accel -= BRAKE_FACTOR*elapsed
 	elif left_finger_trigger:
-		blimp_speed = min(blimp_speed + ACCEL_FACTOR*elapsed, MAX_SPEED)
+		thrust_accel += ACCEL_FACTOR*elapsed
 	else: 
 		#no finger trigger touched, seek idle speed
 		to_idle_amount = TO_IDLE_FACTOR*elapsed
-		if abs(IDLE_SPEED - blimp_speed) < to_idle_amount:
-			blimp_speed = IDLE_SPEED
-		elif IDLE_SPEED > blimp_speed:
-			blimp_speed += to_idle_amount
-		else:
-			blimp_speed -= to_idle_amount
+		
+		if not SPEED_CONTROL_LEVER and abs(IDLE_SPEED - blimp_speed) > to_idle_amount:
+			if IDLE_SPEED > blimp_speed:
+				thrust_accel += to_idle_amount
+			else:
+				thrust_accel -= to_idle_amount
+		
+	if SPEED_CONTROL_LEVER:
+		if throttle > 0:
+			thrust_accel += throttle*ACCEL_FACTOR*elapsed
+		else: #throttle < 0
+			thrust_accel -= throttle*BRAKE_FACTOR*elapsed
+
+	blimp_speed += thrust_accel
+	#bounding
+	blimp_speed = max(0, blimp_speed)
+	blimp_speed = min(MAX_SPEED, blimp_speed)
+	
+	print "throttle " + str(throttle) + " thrust_accel " + str(thrust_accel) + " blimp_speed " + str(blimp_speed)
 		
 	cave_origin.setPosition(0, 0, blimp_speed*elapsed, viz.REL_LOCAL) 
 	
@@ -821,11 +848,13 @@ def onMouseMove(e):
 #    print e.dy, 'is the relative change y.' 
 
 	global climb_control_lever
-
 	if CLIMB_CONTROL_LEVER:
 		climb_control_lever += e.dy
 
-	pass
+
+	global speed_control_lever
+	if SPEED_CONTROL_LEVER:
+		speed_control_lever += e.dx
 
 viz.callback(viz.MOUSE_MOVE_EVENT,onMouseMove)
 
@@ -833,10 +862,13 @@ viz.callback(viz.MOUSE_MOVE_EVENT,onMouseMove)
 def onMouseDown(button): 
 	global turn_queue
 	global climb_control_lever
+	global speed_control_lever
 	
 	if button == viz.MOUSEBUTTON_LEFT: 
 		turn_queue = 0
 		climb_control_lever = 0
+		speed_control_lever = 0
+	
 		
 viz.callback(viz.MOUSEDOWN_EVENT,onMouseDown) 
 
