@@ -22,7 +22,6 @@ from Logo import Logo
 viz.go(viz.FULLSCREEN |viz.QUAD_BUFFER)
 viz.window.setFullscreen(1)
 
-
 #####################
 #setup CAVE
 #viz.multiSample = 4
@@ -30,8 +29,11 @@ polyMode = viz.POLY_WIRE
 #viz.setFarPlane(1)
 #viz.setMultiSample(config.multiSample) seems to give this error message
 viz.window.setPolyMode(viz.POLY_WIRE)
-viz.MainWindow.fov(50)
+DEFAULT_FOV = 50
+viz.MainWindow.fov(DEFAULT_FOV)
 viz.vsync(viz.ON)#this may increase frame rate but may get tears
+
+viz.ipd(0.2)
 
 compass = viz.addChild('Meshes/arrow.osgb')
 compass.color(0.2,0.8,0.8)
@@ -512,6 +514,10 @@ BRAKE_FACTOR = MAX_SPEED/7 # seconds to stop
 TO_IDLE_FACTOR = MAX_SPEED/30
 blimp_speed = IDLE_SPEED
 
+VERTIGO_FOV = True
+MAX_SPEED_FOV = 40
+STOPPED_FOV = 55
+
 #mouse-based speed control
 SPEED_CONTROL_LEVER = True
 SPEED_CONTOL_SCALE = 150.0
@@ -534,7 +540,7 @@ climb_control_lever = 0
 TURN_ACCEL_RATE = 30.0
 turn_speed = 0
 TURN_DAMPING = 1
-ROLL_FACTOR = 3.0
+ROLL_FACTOR = 1.0
 
 #QUEUED TURNING - non-realistic wheel control
 QUEUED_TURNING = True
@@ -737,6 +743,13 @@ def steeringWheel():
 	#print "throttle " + str(throttle) + " thrust_accel " + str(thrust_accel) + " blimp_speed " + str(blimp_speed)
 		
 	cave_origin.setPosition(0, 0, blimp_speed*elapsed, viz.REL_LOCAL) 
+	
+	# we might not be able to change this live.
+	if VERTIGO_FOV:
+		fov = blimp_speed/MAX_SPEED*(MAX_SPEED_FOV - STOPPED_FOV) + STOPPED_FOV
+		viz.MainWindow.fov(fov)
+	else:
+		viz.MainWindow.fov(DEFAULT_FOV)
 	
 	#climb & elevation
 	#height limits
