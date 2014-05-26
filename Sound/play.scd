@@ -1,8 +1,21 @@
 
-var distanceVolumeI, chiI, sampleOne, sampleOneBuffer, sampleTwo, sampleTwoBuffer, sampleThree, sampleThreeBuffer;
+var distanceVolumeI, chiI, sampleOne, sampleOneBuffer, sampleTwo, sampleTwoBuffer, sampleThree, sampleThreeBuffer, sampleFour, sampleFourBuffer, sampleSensitivity;
 
-sampleOneBuffer = Buffer.read(s, Platform.resourceDir +/+ "sounds/a11wlk01.wav");
+/* Set the sensitivity for the distances to objects */
+sampleSensitivity = 100000;
+
+
+sampleOneBuffer = Buffer.read(s, thisProcess.nowExecutingPath.dirname +/+ "aalesund.wav");
 sampleOne = Synth.new("\help_PlayBuf", [\out, 0, \bufnum, sampleOneBuffer]);
+
+sampleTwoBuffer = Buffer.read(s, thisProcess.nowExecutingPath.dirname +/+ "fiercearcticwind.aif");
+sampleTwo = Synth.new("\help_PlayBuf", [\out, 0, \bufnum, sampleTwoBuffer]);
+
+sampleThreeBuffer = Buffer.read(s, thisProcess.nowExecutingPath.dirname +/+ "iceberg-fragment-svalbard.wav");
+sampleThree = Synth.new("\help_PlayBuf", [\out, 0, \bufnum, sampleThreeBuffer]);
+
+sampleFourBuffer = Buffer.read(s, thisProcess.nowExecutingPath.dirname +/+ "windwinter.wav");
+sampleFour = Synth.new("\help_PlayBuf", [\out, 0, \bufnum, sampleFourBuffer]);
 
 f = { |msg, time, addr|
 	var distance, distanceVolume, distanceVolumeStep, dvi, caveheight, chiStep, chi;
@@ -78,8 +91,22 @@ f = { |msg, time, addr|
 
 	{msg[0] == '/DistToIceSheet'} {
 		"Dist to ice sheet is %\n".postf(msg[1]);
-		linlin(msg[1], 0.00, 100000, 1.0, 0.0).postln;
-		sampleOne.set("volume", (linlin(msg[1], 0.00, 100000, 1.0, 0.0)));
+		linlin(msg[1], 0.00, sampleSensitivity, 1.0, 0.0).postln;
+		sampleOne.set("volume", (linlin(msg[1], 0.00, sampleSensitivity, 1.0, 0.0)));
+
+	}
+
+	{msg[0] == '/DistToAbandoned'} {
+		"Dist to abandoned is %\n".postf(msg[1]);
+		linlin(msg[1], 0.00, sampleSensitivity, 1.0, 0.0).postln;
+		sampleTwo.set("volume", (linlin(msg[1], 0.00, sampleSensitivity, 1.0, 0.0)));
+
+	}
+
+	{msg[0] == '/DistToGlacier'} {
+		"Dist to glacier is %\n".postf(msg[1]);
+		linlin(msg[1], 0.00, sampleSensitivity, 1.0, 0.0).postln;
+		sampleThree.set("volume", (linlin(msg[1], 0.00, sampleSensitivity, 1.0, 0.0)));
 
 	}
 
@@ -88,6 +115,12 @@ f = { |msg, time, addr|
 		//"Rotation time: % sender: %\nmessage: %\n".postf(time, addr, msg);
 }};
 
+sampleOne.set("volume", 0.0);
+sampleTwo.set("volume", 0.0);
+sampleThree.set("volume", 0.0);
+sampleFour.set("volume", 0.0);
+
 thisProcess.addOSCRecvFunc(f);
 //z = Synth.new(\zep);
 s.sendMsg("s_new", "zep", z = s.nextNodeID, 0, 1);
+
