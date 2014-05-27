@@ -27,15 +27,15 @@ f = { |msg, time, addr|
 		//"Position time: % sender: %\nmessage: %\n".postf(time, addr, msg);
 		//distance = msg[1].abs + msg[2].abs + msg[3].abs;
 		distance = msg[1].abs;
-		//"Total pre-distance is: %\n".postf(distance);
-		distance = distance / 350000;
+		"Total pre-distance is: %\n".postf(distance);
+		distance = distance / 450000;
 		distanceVolume = 1.0 - distance;
 
 		if (distanceVolume < 0) {
 			distanceVolume = 0.0;
 		};
 
-		//"Total distance is: %\n".postf(distance);
+		"Total distance is: %\n".postf(distance);
 		"Setting volume to: % from %\n".postf(distanceVolume, distanceVolumeI);
 		if (distanceVolumeI.isNil) {
 			distanceVolumeI = 0.5;
@@ -91,21 +91,21 @@ f = { |msg, time, addr|
 
 	{msg[0] == '/DistToIceSheet'} {
 		"Dist to ice sheet is %\n".postf(msg[1]);
-		linlin(msg[1], 0.00, sampleSensitivity, 1.0, 0.0).postln;
+		//linlin(msg[1], 0.00, sampleSensitivity, 1.0, 0.0).postln;
 		sampleOne.set("volume", (linlin(msg[1], 0.00, sampleSensitivity, 1.0, 0.0)));
 
 	}
 
 	{msg[0] == '/DistToAbandoned'} {
 		"Dist to abandoned is %\n".postf(msg[1]);
-		linlin(msg[1], 0.00, sampleSensitivity, 1.0, 0.0).postln;
+		//linlin(msg[1], 0.00, sampleSensitivity, 1.0, 0.0).postln;
 		sampleTwo.set("volume", (linlin(msg[1], 0.00, sampleSensitivity, 1.0, 0.0)));
 
 	}
 
 	{msg[0] == '/DistToGlacier'} {
 		"Dist to glacier is %\n".postf(msg[1]);
-		linlin(msg[1], 0.00, sampleSensitivity, 1.0, 0.0).postln;
+		//linlin(msg[1], 0.00, sampleSensitivity, 1.0, 0.0).postln;
 		sampleThree.set("volume", (linlin(msg[1], 0.00, sampleSensitivity, 1.0, 0.0)));
 
 	}
