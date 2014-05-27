@@ -13,11 +13,9 @@ import vizjoy
 #IMPORTANT: Need to add a joystick. This will return the first detected joystick
 joy = vizjoy.add()
 #####################
-#get Zepplin
 from Zeppelin import *
-
-import Logo
-from Logo import Logo
+from Logo import *
+from Wind import *
 
 viz.go(viz.FULLSCREEN |viz.QUAD_BUFFER)
 viz.window.setFullscreen(1)
@@ -536,6 +534,8 @@ BRAKE_FACTOR = MAX_SPEED/10.0 # seconds to stop
 TO_IDLE_FACTOR = MAX_SPEED/30.0
 blimp_speed = IDLE_SPEED
 
+wind = Wind(MAX_WIND_SPEED = IDLE_SPEED*0.3)
+
 VERTIGO_FOV = True
 MAX_SPEED_FOV = 40
 STOPPED_FOV = 55
@@ -773,7 +773,11 @@ def steeringWheel():
 	#print "throttle " + str(throttle) + " thrust_accel " + str(thrust_accel) + " blimp_speed " + str(blimp_speed)
 	cave_origin.setPosition(0, 0, blimp_speed*elapsed, viz.REL_LOCAL) 
 	
-	# we might not be able to change FOV live.
+	#wind
+	wind.update(elapsed)
+	cave_origin.setPosition(wind.vx, wind.vy, wind.vz, viz.REL_GLOBAL)
+	
+	# not able to change FOV in cave.
 #	if VERTIGO_FOV:
 #		fov = blimp_speed/MAX_SPEED*(MAX_SPEED_FOV - STOPPED_FOV) + STOPPED_FOV
 #		viz.MainWindow.fov(fov)
