@@ -541,7 +541,7 @@ MAX_SPEED_FOV = 40
 STOPPED_FOV = 55
 
 #mouse-based speed control
-SPEED_CONTROL_LEVER = True
+SPEED_CONTROL_LEVER = False
 SPEED_CONTOL_SCALE = 150.0
 speed_control_lever = 0
 
@@ -554,7 +554,7 @@ CLIMB_LOWER_LIMIT = -unit*0.05
 CLIMB_UPPER_LIMIT = unit
 
 #mouse-based climbing control
-CLIMB_CONTROL_LEVER = True
+CLIMB_CONTROL_LEVER = False
 CLIMBING_CONTROL_SCALE = 150.0
 climb_control_lever = 0
 
@@ -641,12 +641,18 @@ def steeringWheel():
 	cave_pos = cave_origin.getPosition()
 	cave_eul = cave_origin.getEuler()
 
+	#default control values
+	wheel_turn = 0
+	climb_actuation = 0
+	gas = False
+	brake = False
+
 	#joystick control values
 	joy_pos = joy.getPosition()
 	wheel_turn = joy_pos[0]
 	climb_actuation = joy_pos[1]
-	left_finger_trigger = joy.isButtonDown(1)
-	right_finger_trigger = joy.isButtonDown(2)
+	gas = joy.isButtonDown(5)
+	brake = joy.isButtonDown(6)
 	#dead zones
 	if abs(climb_actuation) < PEDAL_DEAD_ZONE:
 		climb_actuation = 0
@@ -662,10 +668,10 @@ def steeringWheel():
 		climb_actuation = +1
 	if viz.key.isDown('s'):
 		climb_actuation = -1
-	if viz.key.isDown(viz.KEY_CONTROL_L):
-		right_finger_trigger = True
 	if viz.key.isDown(viz.KEY_SHIFT_L):
-		left_finger_trigger = True
+		gas = True
+	if viz.key.isDown(viz.KEY_CONTROL_L):
+		brake = True
 	
 	if CLIMB_CONTROL_LEVER:
 		climb_actuation += climb_control_lever/CLIMBING_CONTROL_SCALE
@@ -687,7 +693,7 @@ def steeringWheel():
 	
 	
 	#AUTOPILOT
-	controls_dead = (not left_finger_trigger) and (not right_finger_trigger) and \
+	controls_dead = (not gas) and (not brake) and \
 		(climb_actuation == 0) and (wheel_turn == 0)	
 	
 	if controls_dead:
@@ -737,11 +743,11 @@ def steeringWheel():
 			
 	#forward thrust
 	thrust_accel = 0
-	if right_finger_trigger:
-		thrust_accel -= BRAKE_FACTOR*elapsed
-	elif left_finger_trigger:
+	if gas:
 		thrust_accel += ACCEL_FACTOR*elapsed
-	else: 
+	if brake:
+		thrust_accel -= BRAKE_FACTOR*elapsed
+	if not gas and not brake: 
 		#no finger trigger touched, seek idle speed
 		to_idle_amount = TO_IDLE_FACTOR*elapsed
 		
