@@ -452,8 +452,11 @@ def printPOSITION ():
 	differencey = ZEPPOSITIONy -whereAmIy 
 	differencez = ZEPPOSITIONz -whereAmIz
 	
-	ICESHEET = (3872.9387207, 315.1769104, 83884.96875)
 	
+	
+	ICESHEET = [227750.359375, 2701.13916015625, 272510.34375]
+	ABANDONED = [95974.7109375, 1244.484130859375, 323311.78125]
+	GLACIER = (435393.03125, 13339.1962890625, 346158.5)
 	
 #######VectorLength is the distance from us to ZEP
 	ZepVect = viz.Vector(ZEP.getPosition())
@@ -464,12 +467,16 @@ def printPOSITION ():
 	ToIce = ICESHEET - WhereAmIVect
 	distanceToIce = ToIce.length()
 	
-
-	#print "distanceTOZEP = "
-	#print distance
+	ToABA = ABANDONED - WhereAmIVect
+	distanceToAban= ToABA.length()
 	
+	ToGLA = GLACIER - WhereAmIVect
+	distanceToGlac = ToGLA.length()
+	
+	#print "distanceTOZEP = "
+	#print distancedddd
 	#print "Altitude = "
-	#print whereAmIy
+#	print WhereAmIVect
 
 	#Send along position and rotation via OSC
 	ZPOSmsg = OSCMessage("/ZEPPOSITION")
@@ -496,8 +503,23 @@ def printPOSITION ():
 	DistToICESHEET.append(distanceToIce)
 	client.send(DistToICESHEET)
 	
-#	print "DistToICESHEET = "
-#	print distanceToIce
+	
+	DistToABANDONED= OSCMessage("/DistToAbandoned")
+	DistToABANDONED.append(distanceToAban)
+	client.send(DistToABANDONED)
+	
+	DistToGLACIER = OSCMessage("/DistToGlacier")
+	DistToGLACIER.append(distanceToGlac)
+	client.send(DistToGLACIER)
+	
+#	print "ICESHEET = "
+#	print DistToICESHEET
+#	
+#	print "Abandoned = "
+#	print DistToABANDONED
+#	
+#	print "Glacier = "
+#	print DistToGLACIER
 # Also Uncomment here to get position in the console & see below	
 # Nb. set the number lower to print out the pos and rot more often
 vizact.ontimer(1, printPOSITION)
