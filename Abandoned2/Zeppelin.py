@@ -4,11 +4,8 @@ import vizact
 import random
 import math
 
-#viz.go()
-
 SCALING = 56000 #Default Scaling (5600 is good)
 SMALLSCALE = SCALING/25
-
 
 ###########################
 # Add a zepplin model - you may have to set path to model
