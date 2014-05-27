@@ -531,9 +531,9 @@ PEDAL_DEAD_ZONE = 0.15
 #forward speed
 MAX_SPEED = 3000.0
 IDLE_SPEED = MAX_SPEED*0.1
-ACCEL_FACTOR = MAX_SPEED/14 # seconds to max speed
-BRAKE_FACTOR = MAX_SPEED/7 # seconds to stop
-TO_IDLE_FACTOR = MAX_SPEED/30
+ACCEL_FACTOR = MAX_SPEED/10.0 # seconds to max speed
+BRAKE_FACTOR = MAX_SPEED/10.0 # seconds to stop
+TO_IDLE_FACTOR = MAX_SPEED/30.0
 blimp_speed = IDLE_SPEED
 
 VERTIGO_FOV = True
@@ -641,6 +641,7 @@ def steeringWheel():
 	cave_pos = cave_origin.getPosition()
 	cave_eul = cave_origin.getEuler()
 
+	# ---------------------------------
 	#default control values
 	wheel_turn = 0
 	climb_actuation = 0
@@ -691,7 +692,7 @@ def steeringWheel():
 		if turn_queue != 0:
 			wheel_turn += math.copysign(min(1, math.pow(abs(turn_queue/QUEUED_TURN_MAX_RATE), 2)), turn_queue)	
 	
-	
+	# ---------------------------------
 	#AUTOPILOT
 	controls_dead = (not gas) and (not brake) and \
 		(climb_actuation == 0) and (wheel_turn == 0)	
@@ -741,6 +742,7 @@ def steeringWheel():
 		if VERBOSE_AUTOPILOT:
 			print ""
 			
+	# ---------------------------------
 	#forward thrust
 	thrust_accel = 0
 	if gas:
@@ -769,16 +771,16 @@ def steeringWheel():
 	blimp_speed = min(MAX_SPEED, blimp_speed)
 	
 	#print "throttle " + str(throttle) + " thrust_accel " + str(thrust_accel) + " blimp_speed " + str(blimp_speed)
-		
 	cave_origin.setPosition(0, 0, blimp_speed*elapsed, viz.REL_LOCAL) 
 	
-	# we might not be able to change this live.
-	if VERTIGO_FOV:
-		fov = blimp_speed/MAX_SPEED*(MAX_SPEED_FOV - STOPPED_FOV) + STOPPED_FOV
-		viz.MainWindow.fov(fov)
-	else:
-		viz.MainWindow.fov(DEFAULT_FOV)
+	# we might not be able to change FOV live.
+#	if VERTIGO_FOV:
+#		fov = blimp_speed/MAX_SPEED*(MAX_SPEED_FOV - STOPPED_FOV) + STOPPED_FOV
+#		viz.MainWindow.fov(fov)
+#	else:
+#		viz.MainWindow.fov(DEFAULT_FOV)
 	
+	# ---------------------------------
 	#climb & elevation
 	#height limits
 	if cave_pos[1] < CLIMB_LOWER_LIMIT:
@@ -793,6 +795,7 @@ def steeringWheel():
 	#set it so compass does not yaw
 	compass.setEuler(-cave_eul[0], COMPASS_EUL[1], COMPASS_EUL[2])
 	
+	# ---------------------------------
 	#rotation
 	# yaw, pitch, roll
 	# yaw is controlled by steering
@@ -820,7 +823,8 @@ def steeringWheel():
 	
 	cave_origin.setEuler(eul)
 	
-	#safety bounds check
+	# ---------------------------------
+	#safety bounds check for the entire map.
 	cave_pos = cave_origin.getPosition()
 	if cave_pos[0] < -unit*0.5 or cave_pos[0] > unit*(columns - 1 + 0.5) or\
 		cave_pos[1] < -unit*0.5 or cave_pos[1] > unit*1.0 or\
