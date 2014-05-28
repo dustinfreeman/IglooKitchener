@@ -16,6 +16,9 @@ s.makeWindow;
 s.initTree;
 f = {Group.new(s.defaultGroup)};
 ServerTree.add(f);
+v = s.volume;
+v.gui;
+
 s.serverRunning;
 	"~/path/to/repository/sounds.scd".standardizePath.load;
 	"/path/to/repository/play.scd".standardizePath.load;
