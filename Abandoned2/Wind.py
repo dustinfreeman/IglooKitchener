@@ -19,7 +19,7 @@ class Wind:
 	
 	def __init__(self, MAX_WIND_SPEED):
 		self.MAX_WIND_SPEED = MAX_WIND_SPEED
-		self.WIND_SPEED_VARIATION = self.MAX_WIND_SPEED/10.0
+		self.WIND_SPEED_VARIATION = self.MAX_WIND_SPEED*0.1
 		self.MAX_ROTATE_SPEED = 0.1
 		
 		self.angle = 0
