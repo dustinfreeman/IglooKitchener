@@ -13,7 +13,7 @@
 // set pin numbers:
 const int buttonPin = 7;     // the number of the pushbutton pin
 const int ledPin =  13;      // the number of the LED pin
-const int extLEDPin = 8;
+const int extLEDPin = 6;
 const int pot_0 = A1;
 const int pot_1 = A0;
 const int encoderPin_grn = 2;
@@ -21,6 +21,8 @@ const int encoderPin_org = 3;
 
 const int xAxis = pot_0;
 const int yAxis = pot_1;
+
+const int DISABLE_ANALOG = true;
 
 
 //Setting constants
@@ -117,17 +119,27 @@ int moveMouseAxis(int id) {
 }
 
 void sendData() {
-	potVal_0 = analogRead(pot_0);
-	potVal_1 = analogRead(pot_1);
-	curPotVals[X] = analogRead(xAxis);
-	curPotVals[Y] = analogRead(yAxis);
+  if (!DISABLE_ANALOG){
+    potVal_0 = analogRead(pot_0);
+    potVal_1 = analogRead(pot_1);
+    curPotVals[X] = analogRead(xAxis);
+    curPotVals[Y] = analogRead(yAxis);  
+  }
+	
 
 	//If MouseControl send commands via mouse.
+  int tempX = 0;
+  int tempY = 0;
 	if (mouseControl) {
-		int tempX = moveMouseAxis(X);
-		int tempY = moveMouseAxis(Y);
+    if (!DISABLE_ANALOG) {
+      int tempX = moveMouseAxis(X);
+      int tempY = moveMouseAxis(Y);  
+    }
+
 		int tempW = wheel.read();
-		Mouse.move(tempX,tempY,tempW);
+
+    Mouse.move(tempX,tempY,tempW);    
+		
 		wheel.write(0);
 
 		Serial.print("Sent #");
