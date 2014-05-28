@@ -423,9 +423,8 @@ def LandVisible():
 		fadefactor = 1-(((distancetoPiece - minAlpha)/( maxDISTANCE-minAlpha) )* maxAlpha)
 		fadefactorCLAMP = viz.clamp(fadefactor,minAlpha,maxAlpha )
 		piece.alpha(fadefactorCLAMP)
-
-vizact.ontimer(0.1,LandVisible) # fast speed 
-############################
+		
+vizact.ontimer(0.1,LandVisible) 
 ############################
 
 ###########################################
@@ -578,21 +577,9 @@ def AUTOPILOT_TO_POS():
 AUTOPILOT_WAIT_TIME = 90 #seconds
 dead_control_time = AUTOPILOT_WAIT_TIME #start in autopilot
 live_control_time = 0 #time someone has been flying it.
-<<<<<<< HEAD
-AUTOPILOT_WHEEL_TURN_AMOUNT = 0.3
-AUTOPILOT_PEDAL_ACTIVATION = 0.3
-AUTOPILOT_TURN_DEADZONE = 5
-=======
-<<<<<<< HEAD
-AUTOPILOT_WHEEL_TURN_AMOUNT = 0.3
-AUTOPILOT_PEDAL_ACTIVATION = 0.3
-AUTOPILOT_TURN_DEADZONE = 5
-=======
 AUTOPILOT_WHEEL_TURN_AMOUNT = 0.1
 AUTOPILOT_PEDAL_ACTIVATION = 0.3
 AUTOPILOT_TURN_DEADZONE = 15
->>>>>>> 48367be54881e956c69127b15b5d8d31522dbe70
->>>>>>> 09851f69fedf35ef2f2fdde5c42d4ca05617c931
 AUTOPILOT_CLIMB_DEADZONE = unit*0.001
 VERBOSE_AUTOPILOT = False
 
@@ -730,19 +717,9 @@ def steeringWheel():
 				climb_actuation = -AUTOPILOT_PEDAL_ACTIVATION
 			
 		#turning to centre, if near edge
-<<<<<<< HEAD
-		near_edge = cave_pos[0] < unit or cave_pos[0] > (columns - 2)*unit or \
-			cave_pos[2] < unit or cave_pos[2] > (rows - 2)*unit
-=======
-<<<<<<< HEAD
-		near_edge = cave_pos[0] < unit or cave_pos[0] > (columns - 2)*unit or \
-			cave_pos[2] < unit or cave_pos[2] > (rows - 2)*unit
-=======
 		near_edge = cave_pos[0] < unit*1.5 or cave_pos[0] > (columns - 2.5)*unit or \
 			cave_pos[2] < unit*1.5 or cave_pos[2] > (rows - 2.5)*unit
->>>>>>> 48367be54881e956c69127b15b5d8d31522dbe70
->>>>>>> 09851f69fedf35ef2f2fdde5c42d4ca05617c931
-		
+
 		yaw = cave_eul[0]	
 		goal_yaw = yaw
 		
