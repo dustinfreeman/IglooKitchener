@@ -423,6 +423,7 @@ def LandVisible():
 		fadefactor = 1-(((distancetoPiece - minAlpha)/( maxDISTANCE-minAlpha) )* maxAlpha)
 		fadefactorCLAMP = viz.clamp(fadefactor,minAlpha,maxAlpha )
 		piece.alpha(fadefactorCLAMP)
+		#piece.alpha(1.0) 
 		
 vizact.ontimer(0.1,LandVisible) 
 ############################
