@@ -25,7 +25,7 @@ viz.window.setFullscreen(1)
 #viz.multiSample = 4
 polyMode = viz.POLY_WIRE
 #viz.setFarPlane(1)
-#viz.setMultiSample(config.multiSample) seems to give this error message
+#viz.setMultiSample(4) #don't see a difference in landscapes with anti-aliasing.
 viz.window.setPolyMode(viz.POLY_WIRE)
 DEFAULT_FOV = 50
 viz.MainWindow.fov(DEFAULT_FOV)
@@ -578,9 +578,9 @@ def AUTOPILOT_TO_POS():
 AUTOPILOT_WAIT_TIME = 90 #seconds
 dead_control_time = AUTOPILOT_WAIT_TIME #start in autopilot
 live_control_time = 0 #time someone has been flying it.
-AUTOPILOT_WHEEL_TURN_AMOUNT = 0.3
+AUTOPILOT_WHEEL_TURN_AMOUNT = 0.1
 AUTOPILOT_PEDAL_ACTIVATION = 0.3
-AUTOPILOT_TURN_DEADZONE = 5
+AUTOPILOT_TURN_DEADZONE = 15
 AUTOPILOT_CLIMB_DEADZONE = unit*0.001
 VERBOSE_AUTOPILOT = False
 
@@ -718,8 +718,8 @@ def steeringWheel():
 				climb_actuation = -AUTOPILOT_PEDAL_ACTIVATION
 			
 		#turning to centre, if near edge
-		near_edge = cave_pos[0] < unit or cave_pos[0] > (columns - 2)*unit or \
-			cave_pos[2] < unit or cave_pos[2] > (rows - 2)*unit
+		near_edge = cave_pos[0] < unit*1.5 or cave_pos[0] > (columns - 2.5)*unit or \
+			cave_pos[2] < unit*1.5 or cave_pos[2] > (rows - 2.5)*unit
 		
 		yaw = cave_eul[0]	
 		goal_yaw = yaw
