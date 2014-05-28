@@ -423,6 +423,7 @@ def LandVisible():
 		fadefactor = 1-(((distancetoPiece - minAlpha)/( maxDISTANCE-minAlpha) )* maxAlpha)
 		fadefactorCLAMP = viz.clamp(fadefactor,minAlpha,maxAlpha )
 		piece.alpha(fadefactorCLAMP)
+		#piece.alpha(1.0) 
 		
 vizact.ontimer(0.1,LandVisible) 
 ############################
@@ -564,10 +565,11 @@ ROLL_FACTOR = 1.0
 #QUEUED TURNING - non-realistic wheel control
 QUEUED_TURNING = True
 turn_queue = 0
-QUEUED_WHEEL_TURN_RATE = 0.7
+QUEUED_TURN_RATIO = 0.1
 QUEUED_TURN_DEAD_ZONE = 0.5
 QUEUED_TURN_DIRN = 1
-QUEUED_TURN_MAX_RATE = 50.0
+QUEUED_TURN_MAX_RATE = 10.0
+MAX_QUEUED_TURN_AMOUNT = QUEUED_TURN_MAX_RATE * 1.5 #the size of our queued turn buffer.
 
 #autopilot to pos is a nice blank tile
 def AUTOPILOT_TO_POS():
@@ -742,7 +744,7 @@ def steeringWheel():
 	# ---------------------------------
 	#forward thrust
 	thrust_accel = 0
-	if gas:
+	if gas and not brake:
 		thrust_accel += ACCEL_FACTOR*elapsed
 		GasOn = OSCMessage("/GasOn")
 		client.send(GasOn)
@@ -896,7 +898,10 @@ def breathe():
 def mouseWheel(direction):
 	#print "mouseWheel: " + str(direction)
 	global turn_queue
-	turn_queue += QUEUED_TURN_DIRN*direction
+	turn_queue += QUEUED_TURN_DIRN*QUEUED_TURN_RATIO*direction
+	
+	if abs(turn_queue) > MAX_QUEUED_TURN_AMOUNT:
+		turn_queue = math.copysign(MAX_QUEUED_TURN_AMOUNT, turn_queue)
 	
 viz.callback(viz.MOUSEWHEEL_EVENT, mouseWheel) 
 
