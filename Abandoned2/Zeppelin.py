@@ -11,8 +11,6 @@ rows = 9 #	horizontal
 columns = 10
 autopilot_origin = ( (rows/2 + 0.5)* unit, unit*0.01, (columns/2 + 0.5)*unit)		
 
-SCALING = unit
-
 random.seed()
 
 ###########################
@@ -49,14 +47,10 @@ def getZep():
 	return ZEP
 		
 def getRandomPt():
-#	a = random.randint(0,6*SCALING)
-#	b = random.randint (0,(SCALING/2))
-#	c = random.randint(0,6*SCALING)
 
-	EXPAND = 0.1
-	a = autopilot_origin[0] + random.randint(-unit*EXPAND, unit*EXPAND)
-	b = autopilot_origin[1] + random.randint(-unit*EXPAND, unit*EXPAND)
-	c = autopilot_origin[2] + random.randint(-unit*EXPAND, unit*EXPAND)
+	a = autopilot_origin[0] + random.randint(-unit*5, unit*5)
+	b = autopilot_origin[1] + random.randint(-unit*0.01, unit*0.5)
+	c = autopilot_origin[2] + random.randint(-unit*5, unit*5)
 	
 	return a,b,c
 	
@@ -117,17 +111,16 @@ def setRandomPath(ZEP, start_pos = 0):
 	#Set the animation path speed
 	path.speed(.008)
 
-	
 
-zep_origin = (autopilot_origin[0], autopilot_origin[1], autopilot_origin[2] + unit*0.1)
+zep_origin = (autopilot_origin[0], autopilot_origin[1], autopilot_origin[2])
 
-for x in range(10):
+for x in range(8):
 	ZEP = getZep()
-	setRandomPath(ZEP, zep_origin)
+	setRandomPath(ZEP)
 
 #this is the magic ZEP that gets its position date to the CAVe so we can get sound thingies
 MAGIC = getZep()
-setRandomPath(MAGIC, zep_origin)
+setRandomPath(MAGIC)
 
 
 ##############LINK Viewpoint to Zepplin

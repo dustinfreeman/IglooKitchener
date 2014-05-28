@@ -225,13 +225,9 @@ def setCave():
 	view = viz.MainView
 	counter = 0
 
-#def trackingEnable():
-#	artTracker.enable
-
-
 def artTrackerUpdate():
 	
-#	print viz.elapsed() #about 0.003
+#	print viz.elapsed() #about 0.003 @ 30 fps
 	elapsed = viz.elapsed()
 	fps_speed = elapsed*speed
 	fps_rot_speed = elapsed*rot_speed
