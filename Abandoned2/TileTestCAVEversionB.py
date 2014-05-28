@@ -429,7 +429,8 @@ vizact.ontimer(0.1,LandVisible) # fast speed
 ############################
 
 ###########################################
-# A thing that prints out the position and rotation of the zep
+# prints out the position and rotation of the zep
+# also, sends periodic position data to OSC.
 def printPOSITION ():
 	ZEPPOSITION = MAGIC_ZEP.getPosition()
 	ZEPROTATION = (MAGIC_ZEP.getEuler()[0])/360.0 + 180.0 #normalized 0..1
@@ -840,6 +841,7 @@ def steeringWheel():
 		cave_pos[2] < -unit*0.5 or cave_pos[2] > unit*(rows - 1  + 0.5):
 		print "out of bounds reset"
 		to_start_location()
+
 
 ###############################
 breath_time = 0
