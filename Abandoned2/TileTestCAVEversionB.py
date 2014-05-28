@@ -513,7 +513,10 @@ def printPOSITION ():
 	client.send(DistToGLACIER)
 	
 	WindSpeed = OSCMessage("/WindSpeed")
-	WindSpeed.append(wind.wind_speed/(IDLE_SPEED*1.5))
+	if IDLE_SPEED == 0:
+		WindSpeed.append(0.0)
+	else:
+		WindSpeed.append(wind.wind_speed/(IDLE_SPEED*1.5))
 	client.send(WindSpeed)
 	
 #	print "ICESHEET = "
@@ -583,10 +586,10 @@ def AUTOPILOT_TO_POS():
 	return ( (rows/2 + 0.5)* unit, unit*0.01, (columns/2 + 0.5)*unit)
 
 #autopilot
-AUTOPILOT_WAIT_TIME = 180 #seconds
+AUTOPILOT_WAIT_TIME = 90 #seconds
 dead_control_time = AUTOPILOT_WAIT_TIME #start in autopilot
 live_control_time = 0 #time someone has been flying it.
-AUTOPILOT_WHEEL_TURN_AMOUNT = 0.1
+AUTOPILOT_WHEEL_TURN_AMOUNT = 0.3
 AUTOPILOT_PEDAL_ACTIVATION = 0.3
 AUTOPILOT_TURN_DEADZONE = 5
 AUTOPILOT_CLIMB_DEADZONE = unit*0.001
