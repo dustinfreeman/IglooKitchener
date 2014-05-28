@@ -17,10 +17,10 @@ random.seed()
 
 ###########################
 # Add a zepplin model - you may have to set path to model
-
+ZEP_MODEL = viz.addChild('Meshes/ZepZ.OSGB')
 
 def getZep():
-	ZEP = viz.addChild('Meshes/ZepZ.OSGB')
+	ZEP = ZEP_MODEL.clone()
 	
 	# Add a propellor, spin it and position relative to Zepplin
 	PROP = viz.addChild('Meshes/Prop.OSGB',parent=ZEP)
@@ -37,7 +37,7 @@ def getZep():
 	PROP2.setPosition([-.0865,.0592,-0.1475])
 	PROP3.setPosition([.0836,.0589,-0.316])
 	PROP4.setPosition([-.0836,.0589,-0.316])
-	
+
 	ZEP.setScale(1260,1260,1260)
 	ZEP.alpha(.5)
 
@@ -114,21 +114,15 @@ def setRandomPath(ZEP, start_pos = 0):
 
 	
 
+zep_origin = (autopilot_origin[0], autopilot_origin[1], autopilot_origin[2] + unit*0.1)
 
 for x in range(10):
 	ZEP = getZep()
-	setRandomPath(ZEP)
-
-#origin zep
-ZEP = getZep()
-ZEP.setPosition(autopilot_origin)
-
-#ZEP = getZep()
-#setRandomPath(ZEP, (autopilot_origin[0], autopilot_origin[1] + unit * 0.01, autopilot_origin[2] + unit*0.2) )
+	setRandomPath(ZEP, zep_origin)
 
 #this is the magic ZEP that gets its position date to the CAVe so we can get sound thingies
 MAGIC = getZep()
-setRandomPath(MAGIC)
+setRandomPath(MAGIC, zep_origin)
 
 
 ##############LINK Viewpoint to Zepplin
