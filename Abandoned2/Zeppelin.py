@@ -18,15 +18,20 @@ random.seed()
 ###########################
 # Add a zepplin model - you may have to set path to model
 ZEP_MODEL = viz.addChild('Meshes/ZepZ.OSGB')
+PROP_MODEL = viz.addChild('Meshes/Prop.OSGB')
 
 def getZep():
 	ZEP = ZEP_MODEL.clone()
 	
 	# Add a propellor, spin it and position relative to Zepplin
-	PROP = viz.addChild('Meshes/Prop.OSGB',parent=ZEP)
-	PROP2 = viz.addChild('Meshes/Prop.OSGB',parent=ZEP)
-	PROP3 = viz.addChild('Meshes/Prop.OSGB',parent=ZEP)
-	PROP4 = viz.addChild('Meshes/Prop.OSGB',parent=ZEP)
+	PROP = PROP_MODEL.clone()
+	PROP.setParent(ZEP)
+	PROP2 = PROP_MODEL.clone()
+	PROP2.setParent(ZEP)
+	PROP3 = PROP_MODEL.clone()
+	PROP3.setParent(ZEP)
+	PROP4 = PROP_MODEL.clone()
+	PROP4.setParent(ZEP)
 
 	PROP.addAction( vizact.spin(0,0,1,-540) )
 	PROP2.addAction( vizact.spin(0,0,1,510) )
@@ -74,7 +79,7 @@ def setRandomPath(ZEP, start_pos = 0):
 
 	#Initialize an array of control points
 	positions = [ [x,y,z], [a,b,c,], [q,w,e], [f,g,h], [i,j,k] ]
-	print positions
+	print "blimp path: " + str(positions)
 
 	#Create an animation path
 	path = viz.addAnimationPath()
