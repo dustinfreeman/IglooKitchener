@@ -431,32 +431,19 @@ vizact.ontimer(0.1,LandVisible) # fast speed
 ###########################################
 # A thing that prints out the position and rotation of the zep
 def printPOSITION ():
-	ZEPPOSITION = ZEP.getPosition()
-	ZEPROTATION = (ZEP.getEuler()[0])/360.0 + 180.0 #normalized 0..1
+	ZEPPOSITION = MAGIC_ZEP.getPosition()
+	ZEPROTATION = (MAGIC_ZEP.getEuler()[0])/360.0 + 180.0 #normalized 0..1
 	CAVEPOS = cave_origin.getPosition()
 	CAVEROT = cave_origin.getEuler()
 
-	view = view = viz.MainView
-	
-	whereAmIx = view.getPosition()[0]
-	whereAmIy = view.getPosition()[1]
-	whereAmIz = view.getPosition()[2]
-	
-	ZEPPOSITIONx = ZEP.getPosition()[0]
-	ZEPPOSITIONy = ZEP.getPosition()[1]
-	ZEPPOSITIONz = ZEP.getPosition()[2]
-	
-	differencex = ZEPPOSITIONx -whereAmIx 
-	differencey = ZEPPOSITIONy -whereAmIy 
-	differencez = ZEPPOSITIONz -whereAmIz
-	
+	view = view = viz.MainView	
 
 	ICESHEET = [227750.359375, 2701.13916015625, 272510.34375]
 	ABANDONED = [95974.7109375, 1244.484130859375, 323311.78125]
 	GLACIER = (435393.03125, 13339.1962890625, 346158.5)
 	
-#######VectorLength is the distance from us to ZEP
-	ZepVect = viz.Vector(ZEP.getPosition())
+#######VectorLength is the distance from us to MAGIC_ZEP
+	ZepVect = viz.Vector(MAGIC_ZEP.getPosition())
 	WhereAmIVect = viz.Vector(view.getPosition())
 	newLook = ZepVect - WhereAmIVect
 	distance_to_zep = newLook.length()
