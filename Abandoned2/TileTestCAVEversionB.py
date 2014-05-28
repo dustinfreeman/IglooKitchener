@@ -432,7 +432,7 @@ vizact.ontimer(0.1,LandVisible) # fast speed
 # A thing that prints out the position and rotation of the zep
 def printPOSITION ():
 	ZEPPOSITION = ZEP.getPosition()
-	ZEPROTATION = ZEP.getEuler()
+	ZEPROTATION = (ZEP.getEuler()[0])/360.0 + 180.0 #normalized 0..1
 	CAVEPOS = cave_origin.getPosition()
 	CAVEROT = cave_origin.getEuler()
 
@@ -450,8 +450,7 @@ def printPOSITION ():
 	differencey = ZEPPOSITIONy -whereAmIy 
 	differencez = ZEPPOSITIONz -whereAmIz
 	
-	
-	
+
 	ICESHEET = [227750.359375, 2701.13916015625, 272510.34375]
 	ABANDONED = [95974.7109375, 1244.484130859375, 323311.78125]
 	GLACIER = (435393.03125, 13339.1962890625, 346158.5)
@@ -460,7 +459,10 @@ def printPOSITION ():
 	ZepVect = viz.Vector(ZEP.getPosition())
 	WhereAmIVect = viz.Vector(view.getPosition())
 	newLook = ZepVect - WhereAmIVect
-	distance = newLook.length()
+	distance_to_zep = newLook.length()
+	#scale across entire map
+	distance_to_zep /= rows*unit
+	#the magic zeppelin should only be visible within distance_to_zep < 0.1
 	
 	ToIce = ICESHEET - WhereAmIVect
 	distanceToIce = ToIce.length()
@@ -472,14 +474,14 @@ def printPOSITION ():
 	distanceToGlac = ToGLA.length()
 	
 	#print "distanceTOZEP = "
-	#print distancedddd
+	#print distance
 	#print "Altitude = "
 #	print WhereAmIVect
 
 	#Send along position and rotation via OSC
-	ZPOSmsg = OSCMessage("/ZEPPOSITION")
-	ZPOSmsg.append(ZEPPOSITION)
-	client.send(ZPOSmsg)
+#	ZPOSmsg = OSCMessage("/ZEPPOSITION")
+#	ZPOSmsg.append(ZEPPOSITION)
+#	client.send(ZPOSmsg)
 
 	ZROTmsg = OSCMessage("/ZEPROTATION")
 	ZROTmsg.append(ZEPROTATION)
@@ -489,18 +491,18 @@ def printPOSITION ():
 	POSmsg.append(CAVEPOS)
 	client.send(POSmsg)
 
-	ROTmsg = OSCMessage("/CAVEROT")
-	ROTmsg.append(CAVEROT)
-	client.send(ROTmsg)
+#	ROTmsg = OSCMessage("/CAVEROT")
+#	ROTmsg.append(CAVEROT)
+#	client.send(ROTmsg)
 	
+	#distance to zep IS normalized - everything else is not.
 	DistToZep = OSCMessage("/DistToZep")
-	DistToZep.append(distance)
+	DistToZep.append(distance_to_zep)
 	client.send(DistToZep)
 	
 	DistToICESHEET = OSCMessage("/DistToIceSheet")
 	DistToICESHEET.append(distanceToIce)
 	client.send(DistToICESHEET)
-	
 	
 	DistToABANDONED= OSCMessage("/DistToAbandoned")
 	DistToABANDONED.append(distanceToAban)
@@ -509,6 +511,10 @@ def printPOSITION ():
 	DistToGLACIER = OSCMessage("/DistToGlacier")
 	DistToGLACIER.append(distanceToGlac)
 	client.send(DistToGLACIER)
+	
+	WindSpeed = OSCMessage("/WindSpeed")
+	WindSpeed.append(wind.wind_speed/(IDLE_SPEED*1.5))
+	client.send(WindSpeed)
 	
 #	print "ICESHEET = "
 #	print DistToICESHEET
@@ -747,8 +753,18 @@ def steeringWheel():
 	thrust_accel = 0
 	if gas:
 		thrust_accel += ACCEL_FACTOR*elapsed
+		GasOn = OSCMessage("/GasOn")
+		client.send(GasOn)
+	else:
+		GasOff = OSCMessage("/GasOff") 
+		client.send(GasOff)
 	if brake:
 		thrust_accel -= BRAKE_FACTOR*elapsed
+		BrakeOn = OSCMessage("/BrakeOn")
+		client.send(BrakeOn)
+	else:
+		BrakeOff = OSCMessage("/BrakeOff") 
+		client.send(BrakeOff)
 	if not gas and not brake: 
 		#no finger trigger touched, seek idle speed
 		to_idle_amount = TO_IDLE_FACTOR*elapsed
@@ -774,6 +790,8 @@ def steeringWheel():
 	cave_origin.setPosition(0, 0, blimp_speed*elapsed, viz.REL_LOCAL) 
 	
 	#wind
+	#adjust max wind speed based on height
+	wind.MAX_WIND_SPEED = max(IDLE_SPEED*1.5*(cave_origin.getPosition()[1])/unit, 0) + IDLE_SPEED*0.3
 	wind.update(elapsed)
 	cave_origin.setPosition(wind.vx, wind.vy, wind.vz, viz.REL_GLOBAL)
 	
