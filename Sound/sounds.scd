@@ -28,3 +28,35 @@ SynthDef(\help_PlayBuf, {arg out = 0, bufnum = 0, volume = 1.0;
 	Out.ar(out,p
     )
 }).store;
+
+
+// Uncomment below to play with sounds
+
+/*
+z = Synth.new(\zep);
+
+// SR is bassy stuff, range 35-180
+z.set(\sr, 35);
+z.set(\sr, 100);
+z.set(\sr, 180);
+
+// V is volume - 0.1 to 1.0
+z.set(\v, 0.8);
+
+// VIBDC is I have no idea.
+z.set(\vibdc, 120)
+
+// R is also no idea
+z.set(\r, 100.0);
+
+// VN is sounds a bit like the propeller, a bit dizzying, 0.02 to 0.5
+z.set(\vn, 0.02);
+z.set(\vn, 0.5);
+
+// v2 is sets tonal quality, 0.5 sounds best
+z.set(\v2, 0.5);
+
+x = Synth.new(\wind);
+x.set(\oscSpeed, 0.01);
+x.set(\otherOsc, 800);
+*/

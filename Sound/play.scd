@@ -23,6 +23,8 @@ f = { |msg, time, addr|
 	//msg.postln;
 	case
 	{msg[0] == '/DistToZep'} {
+		// This is how far you are away from the zep. I get values 0 to 1
+
 		//"Got a position!".postln;
 		//"Position time: % sender: %\nmessage: %\n".postf(time, addr, msg);
 		//distance = msg[1].abs + msg[2].abs + msg[3].abs;
@@ -62,31 +64,17 @@ f = { |msg, time, addr|
 		"DV is now % and DVI is now %\n\n".postf(distanceVolume, distanceVolumeI);
 	}
 
-	{msg[0] == '/CAVEPOS'} {
-		caveheight = msg[2];
-		caveheight = (caveheight / 150);
-		//caveheight = 100 - caveheight;
-		"Height is now % and it was before %\n".postf(caveheight, msg[2]);
+	{msg[0] == '/WindSpeed'} {
+		//Wind speed. 0 - 1, usually less than 0.1, 1.0 is CRAZY.
+	}
 
-		if (chiI.isNil) {
-			chiI = 0.5;
-		};
+	// GasOn when gas is on, GasOff when gas is off, same with brakes.
 
-		chiStep = (caveheight - chiI)/90;
-		chi = chiI;
-		//"DVStep = %\n".postf(distanceVolumeStep);
-		{
-			90.do ({
-				chi = chi + chiStep;
-				s.sendMsg("/n_set", z, "sr", chi);
-				//"Setting frequency to % with step %\n".postf(chi, chiStep);
-				0.01.wait;
-			})
-		}.fork;
-		chiI = caveheight;
+	{msg[0] == '/ZEPROTATION'} {
+		//This is the zep rotation. I get values 0 - 1
 
-		// Unocmment this and comment out the stuff about steps above to get back to nonsmooth
-		//s.sendMsg("/n_set", z, "sr", caveheight);
+		//"Got a rotation!".postln
+		//"Rotation time: % sender: %\nmessage: %\n".postf(time, addr, msg);
 	}
 
 	{msg[0] == '/DistToIceSheet'} {
@@ -109,11 +97,7 @@ f = { |msg, time, addr|
 		sampleThree.set("volume", (linlin(msg[1], 0.00, sampleSensitivity, 1.0, 0.0)));
 
 	}
-
-	{msg[0] == '/ZEPROTATION'} {
-		//"Got a rotation!".postln
-		//"Rotation time: % sender: %\nmessage: %\n".postf(time, addr, msg);
-}};
+};
 
 sampleOne.set("volume", 0.0);
 sampleTwo.set("volume", 0.0);
