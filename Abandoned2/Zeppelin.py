@@ -4,8 +4,16 @@ import vizact
 import random
 import math
 
-SCALING = 56000 #Default Scaling (5600 is good)
-SMALLSCALE = SCALING/25
+#copied code from cave
+scaling = 5600
+unit = 10 * scaling
+rows = 9 #	horizontal
+columns = 10
+autopilot_origin = ( (rows/2 + 0.5)* unit, unit*0.01, (columns/2 + 0.5)*unit)		
+
+SCALING = unit
+
+random.seed()
 
 ###########################
 # Add a zepplin model - you may have to set path to model
@@ -34,28 +42,35 @@ def getZep():
 	ZEP.alpha(.5)
 
 	return ZEP
+		
+def getRandomPt():
+#	a = random.randint(0,6*SCALING)
+#	b = random.randint (0,(SCALING/2))
+#	c = random.randint(0,6*SCALING)
+
+	EXPAND = 0.1
+	a = autopilot_origin[0] + random.randint(-unit*EXPAND, unit*EXPAND)
+	b = autopilot_origin[1] + random.randint(-unit*EXPAND, unit*EXPAND)
+	c = autopilot_origin[2] + random.randint(-unit*EXPAND, unit*EXPAND)
 	
-def setRandomPath(ZEP):
+	return a,b,c
+	
+	
+def setRandomPath(ZEP, start_pos = 0):
 	#Generate random values for position 
-	x = random.randint(0,6*SCALING)
-	y = random.randint(0,(SCALING/2))
-	z = random.randint(0,6*SCALING)
 	
-	a = random.randint(0,6*SCALING)
-	b = random.randint (0,(SCALING/2))
-	c = random.randint(0,6*SCALING)
-
-	q = random.randint(0,6*SCALING)
-	w = random.randint(0,(SCALING/2))
-	e = random.randint (0,6*SCALING)
+	if start_pos == 0:
+		x,y,z = getRandomPt()
+	else:
+		x,y,z = start_pos
 	
-	f = random.randint(0,6*SCALING)
-	g = random.randint(0,(SCALING/2))
-	h = random.randint(0,6*SCALING)
+	a,b,c = getRandomPt()
 
-	i = random.randint(0,6*SCALING)
-	j = random.randint(0,(SCALING/2))
-	k = random.randint(0,6*SCALING)
+	q,w,e = getRandomPt()
+	
+	f,g,h = getRandomPt()
+
+	i,j,k = getRandomPt()
 
 	#Initialize an array of control points
 	positions = [ [x,y,z], [a,b,c,], [q,w,e], [f,g,h], [i,j,k] ]
@@ -97,21 +112,28 @@ def setRandomPath(ZEP):
 	#Set the animation path speed
 	path.speed(.008)
 
+	
 
-	
-	
-##############LINK Viewpoint to Zepplin
-#ZEPViewLink =  viz.link(ZEP, VIEW)
-#ZEPViewLink.preTrans([0, 0, -202])#give it an offset to see the ZEP
 
 for x in range(10):
 	ZEP = getZep()
 	setRandomPath(ZEP)
 
+#origin zep
+ZEP = getZep()
+ZEP.setPosition(autopilot_origin)
+
+#ZEP = getZep()
+#setRandomPath(ZEP, (autopilot_origin[0], autopilot_origin[1] + unit * 0.01, autopilot_origin[2] + unit*0.2) )
 
 #this is the magic ZEP that gets its position date to the CAVe so we can get sound thingies
 MAGIC = getZep()
 setRandomPath(MAGIC)
+
+
+##############LINK Viewpoint to Zepplin
+#ZEPViewLink =  viz.link(ZEP, VIEW)
+#ZEPViewLink.preTrans([0, 0, -202])#give it an offset to see the ZEP
 
 
 

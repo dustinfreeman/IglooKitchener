@@ -10,8 +10,6 @@ import random
 import math
 import vizjoy
 
-#IMPORTANT: Need to add a joystick. This will return the first detected joystick
-joy = vizjoy.add()
 #####################
 import Zeppelin
 from Logo import *
@@ -19,6 +17,9 @@ from Wind import *
 
 viz.go(viz.FULLSCREEN |viz.QUAD_BUFFER)
 viz.window.setFullscreen(1)
+
+#IMPORTANT: Need to add a joystick. This will return the first detected joystick
+joy = vizjoy.add()
 
 #####################
 #setup CAVE
