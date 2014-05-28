@@ -11,7 +11,9 @@ SMALLSCALE = SCALING/25
 # Add a zepplin model - you may have to set path to model
 
 
-def setUpZEP(ZEP):	
+def getZep():
+	ZEP = viz.addChild('Meshes/ZepZ.OSGB')
+	
 	# Add a propellor, spin it and position relative to Zepplin
 	PROP = viz.addChild('Meshes/Prop.OSGB',parent=ZEP)
 	PROP2 = viz.addChild('Meshes/Prop.OSGB',parent=ZEP)
@@ -27,10 +29,13 @@ def setUpZEP(ZEP):
 	PROP2.setPosition([-.0865,.0592,-0.1475])
 	PROP3.setPosition([.0836,.0589,-0.316])
 	PROP4.setPosition([-.0836,.0589,-0.316])
+	
+	ZEP.setScale(1260,1260,1260)
+	ZEP.alpha(.5)
 
-	##########################################
-	###################################
-	##########################################
+	return ZEP
+	
+def setRandomPath(ZEP):
 	#Generate random values for position 
 	x = random.randint(0,6*SCALING)
 	y = random.randint(0,(SCALING/2))
@@ -99,18 +104,14 @@ def setUpZEP(ZEP):
 #ZEPViewLink =  viz.link(ZEP, VIEW)
 #ZEPViewLink.preTrans([0, 0, -202])#give it an offset to see the ZEP
 
-for x in range(0,10):
-	ZEP = viz.addChild('Meshes/ZepZ.OSGB')
-	ZEP.setScale(1260,1260,1260)
-	ZEP.alpha(.5)
-	setUpZEP(ZEP)
+for x in range(10):
+	ZEP = getZep()
+	setRandomPath(ZEP)
 
 
 #this is the magic ZEP that gets its position date to the CAVe so we can get sound thingies
-MAGIC_ZEP = viz.addChild('Meshes/ZepZ.OSGB')
-MAGIC_ZEP.setScale(1260,1260,1260)
-MAGIC_ZEP.alpha(.5)
-setUpZEP(MAGIC_ZEP)
+MAGIC = getZep()
+setRandomPath(MAGIC)
 
 
 
