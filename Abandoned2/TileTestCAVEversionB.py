@@ -825,15 +825,21 @@ def steeringWheel():
 			#print "turn_queue: " + str(turn_queue)
 			pass
 	cave_origin.setEuler(turn_amount, 0, 0, viz.REL_LOCAL)
-	eul = cave_origin.getEuler()
+	cave_eul = cave_origin.getEuler()
 	
 	#climbing pitch
-	eul[1] = -climb_speed*CLIMB_PITCH_FACTOR
+	cave_eul[1] = -climb_speed*CLIMB_PITCH_FACTOR
 	
 	#banking roll
-	eul[2] = -turn_speed*math.sqrt(blimp_speed/MAX_SPEED)*ROLL_FACTOR
+	cave_eul[2] = -turn_speed*math.sqrt(blimp_speed/MAX_SPEED)*ROLL_FACTOR
 	
-	cave_origin.setEuler(eul)
+	cave_origin.setEuler(cave_eul)
+	
+	#indicators & other UI
+	
+	windspeed_indicator.setEuler(-cave_eul[0] + wind.angle*2*math.pi, 0, 0)
+	wind_scale = wind.wind_speed/(IDLE_SPEED*0.3)
+	windspeed_indicator.setScale(1,1,wind_scale)
 	
 	# ---------------------------------
 	#safety bounds check for the entire map.
@@ -961,6 +967,12 @@ vizact.ontimer(0.0,FadeLogoCheck)
 compass.setParent(cave_origin)
 compass.setPosition(0, -5, 10)
 compass.setScale(6, 6, 6)
+
+windspeed_indicator = vizshape.addArrow(10000)
+windspeed_indicator.setParent(cave_origin)
+windspeed_indicator.setPosition([0.0, -2800.0, 17000.0])
+windspeed_indicator.color(254, 97, 52)
+
 #######################
 
 to_start_location()

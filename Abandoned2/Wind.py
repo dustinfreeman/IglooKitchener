@@ -14,13 +14,13 @@ class Wind:
 		self.wind_speed = min(self.wind_speed, self.MAX_WIND_SPEED)
 		
 		#note: not sure if I have this correspondence between x&z right.
-		self.vx = math.cos(self.angle)*self.wind_speed*elapsed
-		self.vz = math.sin(self.angle)*self.wind_speed*elapsed
+		self.vx = math.sin(self.angle)*self.wind_speed*elapsed
+		self.vz = math.cos(self.angle)*self.wind_speed*elapsed
 	
 	def __init__(self, MAX_WIND_SPEED):
 		self.MAX_WIND_SPEED = MAX_WIND_SPEED
-		self.WIND_SPEED_VARIATION = self.MAX_WIND_SPEED*0.1
-		self.MAX_ROTATE_SPEED = 0.1
+		self.WIND_SPEED_VARIATION = self.MAX_WIND_SPEED*0.4
+		self.MAX_ROTATE_SPEED = 0.6
 		
 		self.angle = 0
 		self.wind_speed = self.MAX_WIND_SPEED
