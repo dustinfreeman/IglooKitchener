@@ -145,7 +145,7 @@ def placePieces():
 placePieces()
 
 ###############################
-#gives readout of which pice you are over
+#gives readout of which piece you are over
 def checkProx(player, piece):
 	distance = math.sqrt((player[0] - piece[0])**2 + (player[2] - piece[2])**2)
 	return distance
@@ -422,7 +422,7 @@ def steeringWheel():
 
 	#joystick control values
 	joy_pos = joy.getPosition()
-	wheel_turn = joy_pos[0]
+	#wheel_turn = joy_pos[0] #we put that slot in the wood for a reason.
 	climb_actuation = joy_pos[1]
 	gas = joy.isButtonDown(5)
 	brake = joy.isButtonDown(6)
@@ -754,11 +754,13 @@ turn_queue_compass.color(0.8, 0.2, 0.2)
 turn_queue_compass.setParent(cave.cave_origin)
 turn_queue_compass.setPosition(0, -5.5, 10)
 turn_queue_compass.setScale(6, 6, 6)
+turn_queue_compass.alpha(0)
 
 windspeed_indicator = vizshape.addArrow(10000)
 windspeed_indicator.setParent(cave.cave_origin)
 windspeed_indicator.setPosition([0.0, -2800.0, 17000.0])
 windspeed_indicator.color(254, 97, 52)
+windspeed_indicator.alpha(0)
 
 ######################
 #movement with art tracker.
