@@ -45,6 +45,21 @@ def getZep():
 	ZEP.alpha(.5)
 
 	return ZEP
+
+def getCirclePath(circling_centre, radius):
+	#circling around the y-axis (vertical)
+	positions = []
+
+	RES = 4
+	for i in range(RES):
+		angle = (2*math.pi/RES) * i
+		pos = [circling_centre[0] + math.cos(angle)*radius, \
+			circling_centre[1], \
+			circling_centre[2] + math.sin(angle)*radius ]
+
+		positions.append(pos)
+
+	return positions
 		
 def getRandomPt():
 
@@ -54,10 +69,7 @@ def getRandomPt():
 	
 	return a,b,c
 	
-	
-def setRandomPath(ZEP, start_pos = 0):
-	#Generate random values for position 
-	
+def getRandomPath(start_pos = 0):
 	if start_pos == 0:
 		x,y,z = getRandomPt()
 	else:
@@ -73,6 +85,21 @@ def setRandomPath(ZEP, start_pos = 0):
 
 	#Initialize an array of control points
 	positions = [ [x,y,z], [a,b,c,], [q,w,e], [f,g,h], [i,j,k] ]
+
+	return positions
+
+def translatePath(positions, translation):
+	#returns a translated version of the path
+
+	t_positions = []
+	for pos in positions:
+		t_positions.append([pos[0] + translation[0], pos[1] + translation[1] + pos[2] + translation[2]])
+
+	return t_positions
+
+def setZepPath(ZEP, positions = getRandomPath()):
+	#Generate random values for position 
+	
 	print "blimp path: " + str(positions)
 
 	#Create an animation path
@@ -109,18 +136,44 @@ def setRandomPath(ZEP, start_pos = 0):
 	path.play()
 
 	#Set the animation path speed
-	path.speed(.008)
+	path.speed(.006)
+	
+	
+##############LINK Viewpoint to Zepplin
+#ZEPViewLink =  viz.link(ZEP, VIEW)
+#ZEPViewLink.preTrans([0, 0, -202])#give it an offset to see the ZEP
 
+#zep_origin = (autopilot_origin[0], autopilot_origin[1], autopilot_origin[2])
 
-zep_origin = (autopilot_origin[0], autopilot_origin[1], autopilot_origin[2])
-
+#generic zeppelins
 for x in range(100):
 	ZEP = getZep()
-	setRandomPath(ZEP)
+	setZepPath(ZEP)
 
 #this is the magic ZEP that gets its position date to the CAVe so we can get sound thingies
 MAGIC = getZep()
-setRandomPath(MAGIC)
+setZepPath(MAGIC)
+
+#formation zeps
+formation_path_centre = getRandomPath()
+formation_path_left = translatePath(formation_path_centre, [unit*0.01, -unit*0.001, 0])
+formation_path_right = translatePath(formation_path_centre, [unit*0.01, -unit*0.001, unit*0.01])
+CENTRE = getZep()
+setZepPath(CENTRE, formation_path_centre)
+LEFT = getZep()
+setZepPath(LEFT, formation_path_left)
+RIGHT = getZep()
+setZepPath(RIGHT, formation_path_right)
+#could possibly do the above with parenting?
+#parenting version:
+#LEFT.setParent(CENTRE)
+#RIGHT.setParent(CENTRE)
+
+
+#zep circling a point of interest
+CIRCLING = getZep()
+circling_centre = (unit, unit*0.1, unit) #should be something coool.
+setZepPath(CIRCLING, getCirclePath(circling_centre, unit*0.1))
 
 
 ##############LINK Viewpoint to Zepplin
