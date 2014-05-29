@@ -17,7 +17,7 @@ SynthDef(\zep, {arg sr=40, v = 0.5, vibdc = 120, r = 0.1, vn = 0.02, v2 = 0.5, p
 }).store;
 
 
-SynthDef(\wind, {arg oscSpeed = 0.1, otherOsc = 400, out= 0, pan = 0;
+SynthDef(\wind, {arg oscSpeed = 0.001, otherOsc = 400, out= 0, pan = 0;
 	y = RLPF.ar(WhiteNoise.ar(), abs(SinOsc.ar(oscSpeed, 0, otherOsc)), 1);
 	p = Pan2.ar(y, pan);
 	Out.ar(out, p);
@@ -42,9 +42,10 @@ z.set(\sr, 180);
 
 // V is volume - 0.1 to 1.0
 z.set(\v, 0.8);
+z.set(\v, 0.1);
 
 // VIBDC is I have no idea.
-z.set(\vibdc, 120)
+z.set(\vibdc, 1000)
 
 // R is also no idea
 z.set(\r, 100.0);
@@ -57,6 +58,6 @@ z.set(\vn, 0.5);
 z.set(\v2, 0.5);
 
 x = Synth.new(\wind);
-x.set(\oscSpeed, 0.01);
-x.set(\otherOsc, 800);
+x.set(\oscSpeed, 0.001);
+x.set(\otherOsc, 2000);
 */
