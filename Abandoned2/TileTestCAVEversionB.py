@@ -578,7 +578,7 @@ def AUTOPILOT_TO_POS():
 AUTOPILOT_WAIT_TIME = 90 #seconds
 dead_control_time = AUTOPILOT_WAIT_TIME #start in autopilot
 live_control_time = 0 #time someone has been flying it.
-AUTOPILOT_WHEEL_TURN_AMOUNT = 0.1
+AUTOPILOT_WHEEL_TURN_AMOUNT = 0.3
 AUTOPILOT_PEDAL_ACTIVATION = 0.3
 AUTOPILOT_TURN_DEADZONE = 15
 AUTOPILOT_CLIMB_DEADZONE = unit*0.001
@@ -726,10 +726,17 @@ def steeringWheel():
 			goal_yaw = 180.0/(math.pi)*math.atan2(AUTOPILOT_TO_POS()[0] - cave_pos[0], AUTOPILOT_TO_POS()[2] - cave_pos[2])
 			
 			if abs(goal_yaw - yaw) > AUTOPILOT_TURN_DEADZONE:
-				if yaw < goal_yaw:
-					wheel_turn = AUTOPILOT_WHEEL_TURN_AMOUNT
-				else:
-					wheel_turn = -AUTOPILOT_WHEEL_TURN_AMOUNT
+				# we opt to turn in just one direction consistently
+				# this is to solve an odd edge case (jokes) ,
+				# where goal_yaw alternates between 179 and -179 degrees and
+				# the blimp isn't able to chase it down before it goes
+				# out of bounds.
+				wheel_turn = AUTOPILOT_WHEEL_TURN_AMOUNT
+				
+#				if yaw < goal_yaw:
+#					wheel_turn = AUTOPILOT_WHEEL_TURN_AMOUNT
+#				else:
+#					wheel_turn = -AUTOPILOT_WHEEL_TURN_AMOUNT
 			
 		if VERBOSE_AUTOPILOT:
 			print "\t yaw: " + str(yaw) + " goal yaw: " + str(goal_yaw) + " " ,
