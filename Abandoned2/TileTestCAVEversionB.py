@@ -23,15 +23,12 @@ joy = vizjoy.add()
 
 #####################
 #setup CAVE
-#viz.multiSample = 4
 polyMode = viz.POLY_WIRE
 #viz.setFarPlane(1)
 #viz.setMultiSample(4) #didn't observe a difference in landscapes with anti-aliasing.
 viz.window.setPolyMode(viz.POLY_WIRE)
-DEFAULT_FOV = 50
-viz.MainWindow.fov(DEFAULT_FOV)
 viz.vsync(viz.ON)#this may increase frame rate but may get tears
-viz.ipd(0.2)
+viz.ipd(0.2) #20 cm apart eyes seemed right.
 
 #####################
 #Setup OSC
@@ -210,10 +207,11 @@ def setCave():
 
 	global viewTracker
 	global cave_origin, counter
-	viewTracker = viztracker.KeyboardMouse6DOF()
-	magicCarpet = viztracker.KeyboardMouse6DOF()
+	magicCarpet = viztracker.KeyboardMouse6DOF() #not sure what this is
+	viewTracker = viztracker.KeyboardMouse6DOF() #the control that comes with the cave.
 	viewTracker.setPosition(0,0,0)
 	cave.setTracker(pos=viewTracker)
+	
 	cave_origin = vizcave.CaveView(viewTracker)
 	view = viz.MainView
 	counter = 0
@@ -518,10 +516,6 @@ blimp_speed = IDLE_SPEED
 
 wind = Wind(MAX_WIND_SPEED = IDLE_SPEED*0.3)
 
-VERTIGO_FOV = True
-MAX_SPEED_FOV = 40
-STOPPED_FOV = 55
-
 #mouse-based speed control
 SPEED_CONTROL_LEVER = False
 SPEED_CONTOL_SCALE = 150.0
@@ -781,13 +775,6 @@ def steeringWheel():
 	wind.MAX_WIND_SPEED = max(IDLE_SPEED*1.5*(cave_origin.getPosition()[1])/unit, 0) + IDLE_SPEED*0.3
 	wind.update(elapsed)
 	cave_origin.setPosition(wind.vx, wind.vy, wind.vz, viz.REL_GLOBAL)
-	
-	# not able to change FOV in cave.
-#	if VERTIGO_FOV:
-#		fov = blimp_speed/MAX_SPEED*(MAX_SPEED_FOV - STOPPED_FOV) + STOPPED_FOV
-#		viz.MainWindow.fov(fov)
-#	else:
-#		viz.MainWindow.fov(DEFAULT_FOV)
 	
 	# ---------------------------------
 	#climb & elevation
