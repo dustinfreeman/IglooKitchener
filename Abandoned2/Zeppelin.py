@@ -88,6 +88,15 @@ def getRandomPath(start_pos = 0):
 
 	return positions
 
+def translatePath(positions, translation):
+	#returns a translated version of the path
+
+	t_positions = []
+	for pos in positions:
+		t_positions.append([pos[0] + translation[0], pos[1] + translation[1] + pos[2] + translation[2]])
+
+	return t_positions
+
 def setZepPath(ZEP, positions = getRandomPath()):
 	#Generate random values for position 
 	
@@ -136,6 +145,7 @@ def setZepPath(ZEP, positions = getRandomPath()):
 
 #zep_origin = (autopilot_origin[0], autopilot_origin[1], autopilot_origin[2])
 
+#generic zeppelins
 for x in range(100):
 	ZEP = getZep()
 	setZepPath(ZEP)
@@ -144,7 +154,18 @@ for x in range(100):
 MAGIC = getZep()
 setZepPath(MAGIC)
 
+#formation zeps
+formation_path_centre = getRandomPath()
+formation_path_left = translatePath(formation_path_centre, [unit*0.01, -unit*0.001, 0])
+formation_path_right = translatePath(formation_path_centre, [unit*0.01, -unit*0.001, unit*0.01])
+CENTRE = getZep()
+setZepPath(CENTRE, formation_path_centre)
+LEFT = getZep()
+setZepPath(LEFT, formation_path_left)
+RIGHT = getZep()
+setZepPath(RIGHT, formation_path_right)
 
+#zep circling a point of interest
 CIRCLING = getZep()
 circling_centre = (unit, unit*0.1, unit) #should be something coool.
 setZepPath(CIRCLING, getCirclePath(circling_centre, unit*0.1))
