@@ -836,7 +836,7 @@ def steeringWheel():
 	
 	#set it so compass does not yaw
 	compass.setEuler(-cave_eul[0], 0, 0, )
-	turn_queue_compass.setEuler(-cave_eul[0] - turn_queue, 0, 0)
+	turn_queue_compass.setEuler(-cave_eul[0] + turn_queue, 0, 0)
 	
 	windspeed_indicator.setEuler(-cave_eul[0] + wind.angle*2*math.pi, 0, 0)
 	wind_scale = wind.wind_speed/(IDLE_SPEED*0.3)
@@ -943,8 +943,14 @@ viz.callback(viz.MOUSEDOWN_EVENT,onMouseDown)
 ######################
 
 def onKeyDown(key): 
-    if key == 'r': 
-        to_start_location()
+	
+	if key == 'q':
+		#start autopilot
+		print "start autopilot"
+		dead_control_time = AUTOPILOT_WAIT_TIME
+		
+	if key == 'r': 
+		to_start_location()
 
 
 viz.callback(viz.KEYDOWN_EVENT,onKeyDown)
@@ -956,11 +962,9 @@ viz.fog(0.7*unit, 1.0*unit) #settings seem good
 cave = vizcave.Cave()
 cave.setFarPlane(0.95*unit)##needs the farplane to have compass
 #cave.setNearPlane(0.1)
-vizact.ontimer(0.0,artTrackerUpdate) #as fast as possible!
-vizact.ontimer(0.0,steeringWheel)
-vizact.ontimer(0.03,breathe)
 setCave()
 
+#setting up objects.
 Logo.setParent(cave_origin)
 Logo.setPosition(0,0,LOGO_DISTANCE)
 vizact.ontimer(0.0,FadeLogoCheck)
@@ -978,6 +982,16 @@ windspeed_indicator.setParent(cave_origin)
 windspeed_indicator.setPosition([0.0, -2800.0, 17000.0])
 windspeed_indicator.color(254, 97, 52)
 
-#######################
+######################
+#movement with art tracker.
+vizact.ontimer(0.0,artTrackerUpdate)
 
+#our steering controls, and assorted UI stuff
+vizact.ontimer(0.0,steeringWheel)
+
+#landscape effects
+vizact.ontimer(0.03,breathe)
+
+#######################
+# start it all!
 to_start_location()
