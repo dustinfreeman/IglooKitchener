@@ -45,7 +45,7 @@ rot_speed = 17 # rotate speed
 from OSC import OSCClient, OSCMessage 
 #OSCHOST  = "172.16.101.174"
 
-OSCHOST  = "localhost" # On windows supercollider, use port 57121 instead of 57120 or is it 57120
+OSCHOST  = "localhost" 
 client = OSCClient()
 client.connect( (OSCHOST, 57120) )
 #####################
