@@ -1,5 +1,5 @@
 
-var distanceVolumeI, chiI, sampleOne, sampleOneBuffer, sampleTwo, sampleTwoBuffer, sampleThree, sampleThreeBuffer, sampleFour, sampleFourBuffer, sampleSensitivity;
+var distanceVolumeI, chiI, sampleOne, sampleOneBuffer, sampleTwo, sampleTwoBuffer, sampleThree, sampleThreeBuffer, sampleFour, sampleFourBuffer, sampleSensitivity, windNoise;
 
 /* Set the sensitivity for the distances to objects */
 sampleSensitivity = 100000;
@@ -18,29 +18,26 @@ sampleFourBuffer = Buffer.read(s, thisProcess.nowExecutingPath.dirname +/+ "wind
 sampleFour = Synth.new("\help_PlayBuf", [\out, 0, \bufnum, sampleFourBuffer]);
 
 f = { |msg, time, addr|
-	var distance, distanceVolume, distanceVolumeStep, dvi, caveheight, chiStep, chi;
+	var distance, distanceVolume, distanceVolumeStep, dvi, caveheight, chiStep, chi, gas, brake;
 
 	//msg.postln;
+	gas = false;
+	brake = false;
+
 	case
 	{msg[0] == '/DistToZep'} {
 		// This is how far you are away from the zep. I get values 0 to 1
-
-		//"Got a position!".postln;
+		"Got a position!".postln;
+		msg.postln;
 		//"Position time: % sender: %\nmessage: %\n".postf(time, addr, msg);
 		//distance = msg[1].abs + msg[2].abs + msg[3].abs;
 		distance = msg[1].abs;
-		"Total pre-distance is: %\n".postf(distance);
-		distance = distance / 450000;
-		distanceVolume = 1.0 - distance;
+		distance = linlin(msg[1], 0.0, 1.0, 180, 35);
 
-		if (distanceVolume < 0) {
-			distanceVolume = 0.0;
-		};
+		distanceVolume = distance;
 
-		"Total distance is: %\n".postf(distance);
-		"Setting volume to: % from %\n".postf(distanceVolume, distanceVolumeI);
 		if (distanceVolumeI.isNil) {
-			distanceVolumeI = 0.5;
+			distanceVolumeI = 0;
 		};
 
 		distanceVolumeStep = (distanceVolume - distanceVolumeI)/90;
@@ -49,10 +46,9 @@ f = { |msg, time, addr|
 		{
 			90.do ({
 				dvi = dvi + distanceVolumeStep;
-				//z.set("v", dvi);
-				//z.set("v2", dvi);
-				s.sendMsg("/n_set", z, "v", dvi);
-				s.sendMsg("/n_set", z, "v2", dvi);
+				//s.sendMsg("/n_set", z, "v", dvi);
+				//s.sendMsg("/n_set", z, "v2", dvi);
+				s.sendMsg("/n_set", z, "sr", dvi);
 				//"Setting volume to % with step %\n".postf(dvi, distanceVolumeStep);
 				0.01.wait;
 			})
@@ -64,18 +60,23 @@ f = { |msg, time, addr|
 		"DV is now % and DVI is now %\n\n".postf(distanceVolume, distanceVolumeI);
 	}
 
-	{msg[0] == '/WindSpeed'} {
-		//Wind speed. 0 - 1, usually less than 0.1, 1.0 is CRAZY.
-	}
-
-	// GasOn when gas is on, GasOff when gas is off, same with brakes.
-
 	{msg[0] == '/ZEPROTATION'} {
 		//This is the zep rotation. I get values 0 - 1
 
 		//"Got a rotation!".postln
 		//"Rotation time: % sender: %\nmessage: %\n".postf(time, addr, msg);
 	}
+
+
+	{msg[0] == '/WindSpeed'} {
+		//Wind speed. 0 - 1, usually less than 0.1, 1.0 is CRAZY.
+		"Wind ".post;
+		linlin(msg[1], 0.0, 1.0, 400, 2000).postln;
+		s.sendMsg("/n_set", windNoise, "otherOsc", (linlin(msg[1], 0.0, 1.0, 400, 2000)));
+
+	}
+
+	// GasOn when gas is on, GasOff when gas is off, same with brakes.
 
 	{msg[0] == '/DistToIceSheet'} {
 		"Dist to ice sheet is %\n".postf(msg[1]);
@@ -107,4 +108,5 @@ sampleFour.set("volume", 0.0);
 thisProcess.addOSCRecvFunc(f);
 //z = Synth.new(\zep);
 s.sendMsg("s_new", "zep", z = s.nextNodeID, 0, 1);
+s.sendMsg("s_new", "wind", windNoise = s.nextNodeID, 0, 1);
 
