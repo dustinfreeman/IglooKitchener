@@ -71,7 +71,7 @@ f = { |msg, time, addr|
 	{msg[0] == '/WindSpeed'} {
 		//Wind speed. 0 - 1, usually less than 0.1, 1.0 is CRAZY.
 		"Wind ".post;
-		linlin(msg[1], 0.0, 1.0, 400, 2000).postln;
+		linlin(msg[1], 0.0, 1.0, 400, 3000).postln;
 		s.sendMsg("/n_set", windNoise, "otherOsc", (linlin(msg[1], 0.0, 1.0, 400, 2000)));
 
 	}
@@ -107,6 +107,8 @@ sampleFour.set("volume", 0.0);
 
 thisProcess.addOSCRecvFunc(f);
 //z = Synth.new(\zep);
-s.sendMsg("s_new", "zep", z = s.nextNodeID, 0, 1);
-s.sendMsg("s_new", "wind", windNoise = s.nextNodeID, 0, 1);
+s.sendMsg("s_new", "zep", z = 1010, 0, 1);
+//z.set(\v, 0.01);
+//z.set(\v2, 0.01);
+s.sendMsg("s_new", "wind", windNoise = 1012, 0, 1);
 

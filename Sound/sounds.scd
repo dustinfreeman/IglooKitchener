@@ -9,7 +9,7 @@ SynthDef.new("background", { arg freq= 440, out = 0;
 	*/
 }).store;
 
-SynthDef(\zep, {arg sr=40, v = 0.5, vibdc = 120, r = 0.1, vn = 0.02, v2 = 0.5, pan = 0, out = 0;
+SynthDef(\zep, {arg sr=40, v = 0.03, vibdc = 120, r = 0.1, vn = 0.02, v2 = 0.03, pan = 0, out = 0;
 	y = FBSineL.ar(SampleRate.ir/sr) * v;
 	z = SinOsc.ar(Vibrato.ar(DC.ar(vibdc),r,vn),0,v2 + 0.2);
 	p = Pan2.ar(y+z, pan);
@@ -43,6 +43,7 @@ z.set(\sr, 180);
 // V is volume - 0.1 to 1.0
 z.set(\v, 0.8);
 z.set(\v, 0.1);
+z.set(\v2, 0.1);
 
 // VIBDC is I have no idea.
 z.set(\vibdc, 1000)
@@ -59,5 +60,5 @@ z.set(\v2, 0.5);
 
 x = Synth.new(\wind);
 x.set(\oscSpeed, 0.001);
-x.set(\otherOsc, 2000);
+x.set(\otherOsc, 3000);
 */
