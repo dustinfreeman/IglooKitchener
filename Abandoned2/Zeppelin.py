@@ -49,7 +49,7 @@ def getZep():
 def getRandomPt():
 
 	a = autopilot_origin[0] + random.randint(-unit*5, unit*5)
-	b = autopilot_origin[1] + random.randint(-unit*0.01, unit*0.5)
+	b = autopilot_origin[1] + random.randint(0, unit*0.5)
 	c = autopilot_origin[2] + random.randint(-unit*5, unit*5)
 	
 	return a,b,c
@@ -114,7 +114,7 @@ def setRandomPath(ZEP, start_pos = 0):
 
 zep_origin = (autopilot_origin[0], autopilot_origin[1], autopilot_origin[2])
 
-for x in range(8):
+for x in range(100):
 	ZEP = getZep()
 	setRandomPath(ZEP)
 
