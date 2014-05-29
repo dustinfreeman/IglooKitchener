@@ -156,8 +156,8 @@ setZepPath(MAGIC)
 
 #formation zeps
 formation_path_centre = getRandomPath()
-formation_path_left = translatePath(formation_path_centre, [unit*0.01, -unit*0.001, 0])
-formation_path_right = translatePath(formation_path_centre, [unit*0.01, -unit*0.001, unit*0.01])
+formation_path_left = translatePath(formation_path_centre, [unit*0.03, -unit*0.01, 0])
+formation_path_right = translatePath(formation_path_centre, [0, -unit*0.01, unit*0.03])
 CENTRE = getZep()
 setZepPath(CENTRE, formation_path_centre)
 LEFT = getZep()
