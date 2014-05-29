@@ -36,6 +36,8 @@ viz.ipd(0.2)
 
 compass = viz.addChild('Meshes/arrow.osgb')
 compass.color(0.2,0.8,0.8)
+turn_queue_compass = compass.copy()
+turn_queue_compass.color(0.8, 0.2, 0.2)
 
 GO_FAST = False
 speed = 2000000 # move speed
@@ -582,9 +584,6 @@ AUTOPILOT_TURN_DEADZONE = 15
 AUTOPILOT_CLIMB_DEADZONE = unit*0.001
 VERBOSE_AUTOPILOT = False
 
-#compass
-COMPASS_EUL = (0.0, 0.0, 0) #for relative usage.
-
 FADE_TIME = 7.5
 LOGO_DISTANCE = 400
 LOGO_FADE_TO_SPOT = -1000
@@ -803,9 +802,7 @@ def steeringWheel():
 	climb_speed += CLIMB_ACCEL_RATE*elapsed*climb_actuation
 	climb_speed *= (1 - CLIMB_DAMPING*elapsed)
 	cave_origin.setPosition(0, climb_speed, 0, viz.REL_LOCAL) 
-	
-	#set it so compass does not yaw
-	compass.setEuler(-cave_eul[0], COMPASS_EUL[1], COMPASS_EUL[2])
+
 	
 	# ---------------------------------
 	#rotation
@@ -836,6 +833,10 @@ def steeringWheel():
 	cave_origin.setEuler(cave_eul)
 	
 	#indicators & other UI
+	
+	#set it so compass does not yaw
+	compass.setEuler(-cave_eul[0], 0, 0, )
+	turn_queue_compass.setEuler(-cave_eul[0] - turn_queue, 0, 0)
 	
 	windspeed_indicator.setEuler(-cave_eul[0] + wind.angle*2*math.pi, 0, 0)
 	wind_scale = wind.wind_speed/(IDLE_SPEED*0.3)
@@ -967,6 +968,10 @@ vizact.ontimer(0.0,FadeLogoCheck)
 compass.setParent(cave_origin)
 compass.setPosition(0, -5, 10)
 compass.setScale(6, 6, 6)
+
+turn_queue_compass.setParent(cave_origin)
+turn_queue_compass.setPosition(0, -5.5, 10)
+turn_queue_compass.setScale(6, 6, 6)
 
 windspeed_indicator = vizshape.addArrow(10000)
 windspeed_indicator.setParent(cave_origin)
