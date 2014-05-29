@@ -10,22 +10,23 @@ import random
 import math
 import vizjoy
 
-#IMPORTANT: Need to add a joystick. This will return the first detected joystick
-joy = vizjoy.add()
 #####################
-from Zeppelin import *
+import Zeppelin
 from Logo import *
 from Wind import *
 
 viz.go(viz.FULLSCREEN |viz.QUAD_BUFFER)
 viz.window.setFullscreen(1)
 
+#IMPORTANT: Need to add a joystick. This will return the first detected joystick
+joy = vizjoy.add()
+
 #####################
 #setup CAVE
 #viz.multiSample = 4
 polyMode = viz.POLY_WIRE
 #viz.setFarPlane(1)
-#viz.setMultiSample(4) #don't see a difference in landscapes with anti-aliasing.
+#viz.setMultiSample(4) #didn't observe a difference in landscapes with anti-aliasing.
 viz.window.setPolyMode(viz.POLY_WIRE)
 DEFAULT_FOV = 50
 viz.MainWindow.fov(DEFAULT_FOV)
@@ -44,7 +45,7 @@ rot_speed = 17 # rotate speed
 from OSC import OSCClient, OSCMessage 
 #OSCHOST  = "172.16.101.174"
 
-OSCHOST  = "localhost" # On windows supercollider, use port 57121 instead of 57120 or is it 57120
+OSCHOST  = "localhost" 
 client = OSCClient()
 client.connect( (OSCHOST, 57120) )
 #####################
@@ -224,13 +225,9 @@ def setCave():
 	view = viz.MainView
 	counter = 0
 
-#def trackingEnable():
-#	artTracker.enable
-
-
 def artTrackerUpdate():
 	
-#	print viz.elapsed() #about 0.003
+#	print viz.elapsed() #about 0.003 @ 30 fps
 	elapsed = viz.elapsed()
 	fps_speed = elapsed*speed
 	fps_rot_speed = elapsed*rot_speed
@@ -432,8 +429,8 @@ vizact.ontimer(0.1,LandVisible)
 # prints out the position and rotation of the zep
 # also, sends periodic position data to OSC.
 def printPOSITION ():
-	ZEPPOSITION = MAGIC_ZEP.getPosition()
-	ZEPROTATION = (MAGIC_ZEP.getEuler()[0])/360.0 + 180.0 #normalized 0..1
+	ZEPPOSITION = Zeppelin.MAGIC.getPosition()
+	ZEPROTATION = (Zeppelin.MAGIC.getEuler()[0])/360.0 + 180.0 #normalized 0..1
 	CAVEPOS = cave_origin.getPosition()
 	CAVEROT = cave_origin.getEuler()
 
@@ -443,8 +440,8 @@ def printPOSITION ():
 	ABANDONED = [95974.7109375, 1244.484130859375, 323311.78125]
 	GLACIER = (435393.03125, 13339.1962890625, 346158.5)
 	
-#######VectorLength is the distance from us to MAGIC_ZEP
-	ZepVect = viz.Vector(MAGIC_ZEP.getPosition())
+#######VectorLength is the distance from us to Zeppelin.MAGIC
+	ZepVect = viz.Vector(Zeppelin.MAGIC.getPosition())
 	WhereAmIVect = viz.Vector(view.getPosition())
 	newLook = ZepVect - WhereAmIVect
 	distance_to_zep = newLook.length()
