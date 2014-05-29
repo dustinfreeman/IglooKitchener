@@ -31,17 +31,8 @@ viz.window.setPolyMode(viz.POLY_WIRE)
 DEFAULT_FOV = 50
 viz.MainWindow.fov(DEFAULT_FOV)
 viz.vsync(viz.ON)#this may increase frame rate but may get tears
-
 viz.ipd(0.2)
 
-compass = viz.addChild('Meshes/arrow.osgb')
-compass.color(0.2,0.8,0.8)
-turn_queue_compass = compass.copy()
-turn_queue_compass.color(0.8, 0.2, 0.2)
-
-GO_FAST = False
-speed = 2000000 # move speed
-rot_speed = 17 # rotate speed
 #####################
 #Setup OSC
 from OSC import OSCClient, OSCMessage 
@@ -227,6 +218,9 @@ def setCave():
 	view = viz.MainView
 	counter = 0
 
+#artracker constants
+speed = 2000000 # move speed
+rot_speed = 17 # rotate speed
 def artTrackerUpdate():
 	
 #	print viz.elapsed() #about 0.003 @ 30 fps
@@ -234,20 +228,11 @@ def artTrackerUpdate():
 	fps_speed = elapsed*speed
 	fps_rot_speed = elapsed*rot_speed
 	
-	if GO_FAST:
-		fps_speed *= 10.0
-		fps_rot_speed *= 5.0
-	
 	viewTracker.setPosition(artTracker.x,artTracker.y,artTracker.z+depth/2)
 	viewTracker.setEuler(artTracker.yaw,artTracker.pitch,artTracker.roll)
 	
 	cave_origin.setPosition(artTracker.jy*artTracker.x2*fps_speed, artTracker.jy*artTracker.y2*fps_speed, artTracker.jy*artTracker.z2*fps_speed,viz.REL_LOCAL)
 	cave_origin.setEuler(fps_rot_speed*artTracker.jx,0.0,0.0,viz.REL_LOCAL)	 
-	
-	
-def updateVisibilityHive():
-	updateVisibility(cave_origin.getPosition())
-	pass
 	
 ####################
 
@@ -610,13 +595,19 @@ def FadeLogoCheck():
 		Logo.setPosition(0,0,(1.0 - fade_amount)*(LOGO_DISTANCE - LOGO_FADE_TO_SPOT) + LOGO_FADE_TO_SPOT)
 	
 		
+def start_autopilot():	
+	global dead_control_time
+	
+	print "start autopilot"
+	dead_control_time = AUTOPILOT_WAIT_TIME
+	
+		
 #set blimp to start in the middle of the map
 def to_start_location():
 	cave_origin.setPosition(AUTOPILOT_TO_POS())
 	cave_origin.setEuler(35,0,0)
 	
-	dead_control_time = AUTOPILOT_WAIT_TIME + FADE_TIME
-
+	start_autopilot()
 
 def steeringWheel():
 	#move the cave_origin around based on the steering wheel
@@ -952,9 +943,7 @@ viz.callback(viz.MOUSEDOWN_EVENT,onMouseDown)
 def onKeyDown(key): 
 	
 	if key == 'q':
-		#start autopilot
-		print "start autopilot"
-		dead_control_time = AUTOPILOT_WAIT_TIME
+		start_autopilot()
 		
 	if key == 'r': 
 		to_start_location()
@@ -976,10 +965,14 @@ Logo.setParent(cave_origin)
 Logo.setPosition(0,0,LOGO_DISTANCE)
 vizact.ontimer(0.0,FadeLogoCheck)
 
+compass = viz.addChild('Meshes/arrow.osgb')
+compass.color(0.2,0.8,0.8)
 compass.setParent(cave_origin)
 compass.setPosition(0, -5, 10)
 compass.setScale(6, 6, 6)
 
+turn_queue_compass = compass.copy()
+turn_queue_compass.color(0.8, 0.2, 0.2)
 turn_queue_compass.setParent(cave_origin)
 turn_queue_compass.setPosition(0, -5.5, 10)
 turn_queue_compass.setScale(6, 6, 6)
