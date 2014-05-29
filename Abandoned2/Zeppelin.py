@@ -90,9 +90,7 @@ def setUpZEP(ZEP):
 	path.play()
 
 	#Set the animation path speed
-	path.speed(.008)
-
-
+	path.speed(.006)
 	
 	
 ##############LINK Viewpoint to Zepplin
