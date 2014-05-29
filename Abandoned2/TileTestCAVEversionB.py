@@ -25,7 +25,7 @@ viz.window.setFullscreen(1)
 #viz.multiSample = 4
 polyMode = viz.POLY_WIRE
 #viz.setFarPlane(1)
-#viz.setMultiSample(config.multiSample) seems to give this error message
+#viz.setMultiSample(4) #don't see a difference in landscapes with anti-aliasing.
 viz.window.setPolyMode(viz.POLY_WIRE)
 DEFAULT_FOV = 50
 viz.MainWindow.fov(DEFAULT_FOV)
@@ -423,40 +423,28 @@ def LandVisible():
 		fadefactor = 1-(((distancetoPiece - minAlpha)/( maxDISTANCE-minAlpha) )* maxAlpha)
 		fadefactorCLAMP = viz.clamp(fadefactor,minAlpha,maxAlpha )
 		piece.alpha(fadefactorCLAMP)
-
-vizact.ontimer(0.1,LandVisible) # fast speed 
-############################
+		#piece.alpha(1.0) 
+		
+vizact.ontimer(0.1,LandVisible) 
 ############################
 
 ###########################################
-# A thing that prints out the position and rotation of the zep
+# prints out the position and rotation of the zep
+# also, sends periodic position data to OSC.
 def printPOSITION ():
-	ZEPPOSITION = ZEP.getPosition()
-	ZEPROTATION = (ZEP.getEuler()[0])/360.0 + 180.0 #normalized 0..1
+	ZEPPOSITION = MAGIC_ZEP.getPosition()
+	ZEPROTATION = (MAGIC_ZEP.getEuler()[0])/360.0 + 180.0 #normalized 0..1
 	CAVEPOS = cave_origin.getPosition()
 	CAVEROT = cave_origin.getEuler()
 
-	view = view = viz.MainView
-	
-	whereAmIx = view.getPosition()[0]
-	whereAmIy = view.getPosition()[1]
-	whereAmIz = view.getPosition()[2]
-	
-	ZEPPOSITIONx = ZEP.getPosition()[0]
-	ZEPPOSITIONy = ZEP.getPosition()[1]
-	ZEPPOSITIONz = ZEP.getPosition()[2]
-	
-	differencex = ZEPPOSITIONx -whereAmIx 
-	differencey = ZEPPOSITIONy -whereAmIy 
-	differencez = ZEPPOSITIONz -whereAmIz
-	
+	view = view = viz.MainView	
 
 	ICESHEET = [227750.359375, 2701.13916015625, 272510.34375]
 	ABANDONED = [95974.7109375, 1244.484130859375, 323311.78125]
 	GLACIER = (435393.03125, 13339.1962890625, 346158.5)
 	
-#######VectorLength is the distance from us to ZEP
-	ZepVect = viz.Vector(ZEP.getPosition())
+#######VectorLength is the distance from us to MAGIC_ZEP
+	ZepVect = viz.Vector(MAGIC_ZEP.getPosition())
 	WhereAmIVect = viz.Vector(view.getPosition())
 	newLook = ZepVect - WhereAmIVect
 	distance_to_zep = newLook.length()
@@ -513,7 +501,10 @@ def printPOSITION ():
 	client.send(DistToGLACIER)
 	
 	WindSpeed = OSCMessage("/WindSpeed")
-	WindSpeed.append(wind.wind_speed/(IDLE_SPEED*1.5))
+	if IDLE_SPEED == 0:
+		WindSpeed.append(0.0)
+	else:
+		WindSpeed.append(wind.wind_speed/(IDLE_SPEED*1.5))
 	client.send(WindSpeed)
 	
 #	print "ICESHEET = "
@@ -527,6 +518,7 @@ def printPOSITION ():
 # Also Uncomment here to get position in the console & see below	
 # Nb. set the number lower to print out the pos and rot more often
 vizact.ontimer(1, printPOSITION)
+
 
 #controls
 WHEEL_DEAD_ZONE = 0.05
@@ -573,22 +565,23 @@ ROLL_FACTOR = 1.0
 #QUEUED TURNING - non-realistic wheel control
 QUEUED_TURNING = True
 turn_queue = 0
-QUEUED_WHEEL_TURN_RATE = 0.7
+QUEUED_TURN_RATIO = 0.1
 QUEUED_TURN_DEAD_ZONE = 0.5
 QUEUED_TURN_DIRN = 1
-QUEUED_TURN_MAX_RATE = 50.0
+QUEUED_TURN_MAX_RATE = 10.0
+MAX_QUEUED_TURN_AMOUNT = QUEUED_TURN_MAX_RATE * 1.5 #the size of our queued turn buffer.
 
 #autopilot to pos is a nice blank tile
 def AUTOPILOT_TO_POS():
 	return ( (rows/2 + 0.5)* unit, unit*0.01, (columns/2 + 0.5)*unit)
 
 #autopilot
-AUTOPILOT_WAIT_TIME = 180 #seconds
+AUTOPILOT_WAIT_TIME = 90 #seconds
 dead_control_time = AUTOPILOT_WAIT_TIME #start in autopilot
 live_control_time = 0 #time someone has been flying it.
 AUTOPILOT_WHEEL_TURN_AMOUNT = 0.1
 AUTOPILOT_PEDAL_ACTIVATION = 0.3
-AUTOPILOT_TURN_DEADZONE = 5
+AUTOPILOT_TURN_DEADZONE = 15
 AUTOPILOT_CLIMB_DEADZONE = unit*0.001
 VERBOSE_AUTOPILOT = False
 
@@ -726,9 +719,9 @@ def steeringWheel():
 				climb_actuation = -AUTOPILOT_PEDAL_ACTIVATION
 			
 		#turning to centre, if near edge
-		near_edge = cave_pos[0] < unit or cave_pos[0] > (columns - 2)*unit or \
-			cave_pos[2] < unit or cave_pos[2] > (rows - 2)*unit
-		
+		near_edge = cave_pos[0] < unit*1.5 or cave_pos[0] > (columns - 2.5)*unit or \
+			cave_pos[2] < unit*1.5 or cave_pos[2] > (rows - 2.5)*unit
+
 		yaw = cave_eul[0]	
 		goal_yaw = yaw
 		
@@ -751,7 +744,7 @@ def steeringWheel():
 	# ---------------------------------
 	#forward thrust
 	thrust_accel = 0
-	if gas:
+	if gas and not brake:
 		thrust_accel += ACCEL_FACTOR*elapsed
 		GasOn = OSCMessage("/GasOn")
 		client.send(GasOn)
@@ -854,6 +847,7 @@ def steeringWheel():
 		print "out of bounds reset"
 		to_start_location()
 
+
 ###############################
 breath_time = 0
 BREATH_DURATION = 10.0
@@ -904,7 +898,10 @@ def breathe():
 def mouseWheel(direction):
 	#print "mouseWheel: " + str(direction)
 	global turn_queue
-	turn_queue += QUEUED_TURN_DIRN*direction
+	turn_queue += QUEUED_TURN_DIRN*QUEUED_TURN_RATIO*direction
+	
+	if abs(turn_queue) > MAX_QUEUED_TURN_AMOUNT:
+		turn_queue = math.copysign(MAX_QUEUED_TURN_AMOUNT, turn_queue)
 	
 viz.callback(viz.MOUSEWHEEL_EVENT, mouseWheel) 
 
