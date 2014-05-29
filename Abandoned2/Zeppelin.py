@@ -164,6 +164,11 @@ LEFT = getZep()
 setZepPath(LEFT, formation_path_left)
 RIGHT = getZep()
 setZepPath(RIGHT, formation_path_right)
+#could possibly do the above with parenting?
+#parenting version:
+#LEFT.setParent(CENTRE)
+#RIGHT.setParent(CENTRE)
+
 
 #zep circling a point of interest
 CIRCLING = getZep()
