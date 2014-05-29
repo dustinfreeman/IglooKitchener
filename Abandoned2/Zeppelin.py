@@ -45,6 +45,21 @@ def getZep():
 	ZEP.alpha(.5)
 
 	return ZEP
+
+def getCirclePath(circling_centre, radius):
+	#circling around the y-axis (vertical)
+	positions = []
+
+	RES = 4
+	for i in range(RES):
+		angle = (2*math.pi/RES) * i
+		pos = [circling_centre[0] + math.cos(angle)*radius, \
+			circling_centre[1], \
+			circling_centre[2] + math.sin(angle)*radius ]
+
+		positions.append(pos)
+
+	return positions
 		
 def getRandomPt():
 
@@ -54,10 +69,7 @@ def getRandomPt():
 	
 	return a,b,c
 	
-	
-def setRandomPath(ZEP, start_pos = 0):
-	#Generate random values for position 
-	
+def getRandomPath(start_pos = 0):
 	if start_pos == 0:
 		x,y,z = getRandomPt()
 	else:
@@ -73,6 +85,12 @@ def setRandomPath(ZEP, start_pos = 0):
 
 	#Initialize an array of control points
 	positions = [ [x,y,z], [a,b,c,], [q,w,e], [f,g,h], [i,j,k] ]
+
+	return positions
+
+def setZepPath(ZEP, positions = getRandomPath()):
+	#Generate random values for position 
+	
 	print "blimp path: " + str(positions)
 
 	#Create an animation path
@@ -120,11 +138,16 @@ def setRandomPath(ZEP, start_pos = 0):
 
 for x in range(100):
 	ZEP = getZep()
-	setRandomPath(ZEP)
+	setZepPath(ZEP)
 
 #this is the magic ZEP that gets its position date to the CAVe so we can get sound thingies
 MAGIC = getZep()
-setRandomPath(MAGIC)
+setZepPath(MAGIC)
+
+
+CIRCLING = getZep()
+circling_centre = (unit, unit*0.1, unit) #should be something coool.
+setZepPath(CIRCLING, getCirclePath(circling_centre, unit*0.1))
 
 
 ##############LINK Viewpoint to Zepplin
