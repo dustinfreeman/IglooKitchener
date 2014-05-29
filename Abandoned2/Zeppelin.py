@@ -93,7 +93,7 @@ def translatePath(positions, translation):
 
 	t_positions = []
 	for pos in positions:
-		t_positions.append([pos[0] + translation[0], pos[1] + translation[1] + pos[2] + translation[2]])
+		t_positions.append([pos[0] + translation[0], pos[1] + translation[1], pos[2] + translation[2]])
 
 	return t_positions
 

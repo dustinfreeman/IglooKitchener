@@ -686,7 +686,7 @@ def steeringWheel():
 		if abs(turn_queue) < QUEUED_TURN_DEAD_ZONE:
 			turn_queue = 0
 		if turn_queue != 0:
-			wheel_turn += math.copysign(min(1, math.pow(abs(turn_queue/QUEUED_TURN_MAX_RATE), 2)), turn_queue)	
+			wheel_turn += math.copysign(min(1, math.pow(abs(turn_queue/QUEUED_TURN_MAX_RATE), 0.5)), turn_queue)	
 	
 	# ---------------------------------
 	#AUTOPILOT

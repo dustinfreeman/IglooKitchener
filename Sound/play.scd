@@ -48,7 +48,8 @@ f = { |msg, time, addr|
 				dvi = dvi + distanceVolumeStep;
 				//s.sendMsg("/n_set", z, "v", dvi);
 				//s.sendMsg("/n_set", z, "v2", dvi);
-				s.sendMsg("/n_set", z, "sr", dvi);
+				//Uncomment this one
+				//s.sendMsg("/n_set", z, "sr", dvi);
 				//"Setting volume to % with step %\n".postf(dvi, distanceVolumeStep);
 				0.01.wait;
 			})
@@ -77,7 +78,39 @@ f = { |msg, time, addr|
 	}
 
 	// GasOn when gas is on, GasOff when gas is off, same with brakes.
+/*
+	{msg[0] == '/GasOn' } {
+		if (gas == false) {
+			gas = true;
+			s.sendMsg("/n_set", z, "v", 0.03);
+			s.sendMsg("/n_set", z, "v2", 0.03);
+		}
+	}
 
+	{msg[0] == '/GasOff' } {
+		if (gas == true) {
+			gas = false;
+			s.sendMsg("/n_set", z, "v", 0.01);
+			s.sendMsg("/n_set", z, "v2", 0.01);
+		}
+	}
+
+	{msg[0] == '/BrakeOn' } {
+		if (brake == false) {
+			brake = true;
+			s.sendMsg("/n_set", z, "v", 0);
+			s.sendMsg("/n_set", z, "v2", 0);
+		}
+	}
+
+	{msg[0] == '/BrakeOff' } {
+		if (brake == false) {
+			brake = true;
+			s.sendMsg("/n_set", z, "v", 0.01);
+			s.sendMsg("/n_set", z, "v2", 0.01);
+		}
+	}
+*/
 	{msg[0] == '/DistToIceSheet'} {
 		"Dist to ice sheet is %\n".postf(msg[1]);
 		//linlin(msg[1], 0.00, sampleSensitivity, 1.0, 0.0).postln;
@@ -107,7 +140,7 @@ sampleFour.set("volume", 0.0);
 
 thisProcess.addOSCRecvFunc(f);
 //z = Synth.new(\zep);
-s.sendMsg("s_new", "zep", z = 1010, 0, 1);
+//s.sendMsg("s_new", "zep", z = 1010, 0, 1);
 //z.set(\v, 0.01);
 //z.set(\v2, 0.01);
 s.sendMsg("s_new", "wind", windNoise = 1012, 0, 1);

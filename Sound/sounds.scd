@@ -9,7 +9,7 @@ SynthDef.new("background", { arg freq= 440, out = 0;
 	*/
 }).store;
 
-SynthDef(\zep, {arg sr=40, v = 0.03, vibdc = 120, r = 0.1, vn = 0.02, v2 = 0.03, pan = 0, out = 0;
+SynthDef(\zep, {arg sr=40, v = 0.01, vibdc = 120, r = 0.1, vn = 0.02, v2 = 0.01, pan = 0, out = 0;
 	y = FBSineL.ar(SampleRate.ir/sr) * v;
 	z = SinOsc.ar(Vibrato.ar(DC.ar(vibdc),r,vn),0,v2 + 0.2);
 	p = Pan2.ar(y+z, pan);
