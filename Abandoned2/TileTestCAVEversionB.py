@@ -217,6 +217,10 @@ def printPOSITION ():
 	ABANDONED = [95974.7109375, 1244.484130859375, 323311.78125]
 	GLACIER = (435393.03125, 13339.1962890625, 346158.5)
 	
+	TWINKLY =[254979.25, 7813.31591796875, 401055.78125]
+	WHALE = [318613.375, 6294.86279296875, 249989.15625]
+	WIRES = [518248.15625, 4830.55615234375, 85015.921875]
+	
 #######VectorLength is the distance from us to Zeppelin.MAGIC
 	ZepVect = viz.Vector(Zeppelin.MAGIC.getPosition())
 	WhereAmIVect = viz.Vector(view.getPosition())
@@ -235,10 +239,19 @@ def printPOSITION ():
 	ToGLA = GLACIER - WhereAmIVect
 	distanceToGlac = ToGLA.length()
 	
+	ToTWINKLY = TWINKLY - WhereAmIVect
+	distanceToTWINKLY = ToTWINKLY.length()
+	
+	ToWHALE = WHALE - WhereAmIVect
+	distanceToWHALE= ToWHALE.length()
+	
+	ToWIRES = WIRES - WhereAmIVect
+	distanceToWIRES= ToWIRES.length()
+	
 	#print "distanceTOZEP = "
 	#print distance
 	#print "Altitude = "
-#	print WhereAmIVect
+	#print WhereAmIVect
 
 	#Send along position and rotation via OSC
 #	ZPOSmsg = OSCMessage("/ZEPPOSITION")
@@ -273,6 +286,19 @@ def printPOSITION ():
 	DistToGLACIER = OSCMessage("/DistToGlacier")
 	DistToGLACIER.append(distanceToGlac)
 	client.send(DistToGLACIER)
+	
+	DistToWIRE = OSCMessage("/DistToWires")
+	DistToWIRE.append(distanceToWIRES)
+	client.send(DistToWIRE)
+	
+	DistToWHA = OSCMessage("/DistToWhale")
+	DistToWHA.append(distanceToWHALE)
+	client.send(DistToWHA)
+	
+	DistToTWINK = OSCMessage("/DistToTwinkly")
+	DistToTWINK.append(distanceToTWINKLY)
+	client.send(DistToTWINK)
+
 	
 	WindSpeed = OSCMessage("/WindSpeed")
 	if IDLE_SPEED == 0:

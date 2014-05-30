@@ -4,6 +4,9 @@ import vizact
 import random
 import math
 
+
+#viz.go()
+
 #copied code from cave
 scaling = 5600
 unit = 10 * scaling

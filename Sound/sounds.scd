@@ -19,7 +19,7 @@ SynthDef(\zep, {arg sr=40, v = 0.01, vibdc = 120, r = 0.1, vn = 0.02, v2 = 0.01,
 
 SynthDef(\wind, {arg oscSpeed = 0.001, otherOsc = 400, out= 0, pan = 0;
 	y = RLPF.ar(WhiteNoise.ar(), abs(SinOsc.ar(oscSpeed, 0, otherOsc)), 1);
-	p = Pan2.ar(y, pan);
+	p = Pan4.ar(y, pan);
 	Out.ar(out, p);
 }).store;
 

@@ -1,5 +1,5 @@
 
-var distanceVolumeI, chiI, sampleOne, sampleOneBuffer, sampleTwo, sampleTwoBuffer, sampleThree, sampleThreeBuffer, sampleFour, sampleFourBuffer, sampleSensitivity, windNoise;
+var distanceVolumeI, chiI, sampleOne, sampleOneBuffer, sampleTwo, sampleTwoBuffer, sampleThree, sampleThreeBuffer, sampleFour, sampleFourBuffer, sampleFive, sampleFiveBuffer, sampleSix, sampleSixBuffer, sampleSeven, sampleSevenBuffer, sampleSensitivity, windNoise;
 
 /* Set the sensitivity for the distances to objects */
 sampleSensitivity = 100000;
@@ -16,6 +16,15 @@ sampleThree = Synth.new("\help_PlayBuf", [\out, 0, \bufnum, sampleThreeBuffer]);
 
 sampleFourBuffer = Buffer.read(s, thisProcess.nowExecutingPath.dirname +/+ "windwinter.wav");
 sampleFour = Synth.new("\help_PlayBuf", [\out, 0, \bufnum, sampleFourBuffer]);
+
+sampleFiveBuffer = Buffer.read(s, thisProcess.nowExecutingPath.dirname +/+ "whale.aif");
+sampleFive = Synth.new("\help_PlayBuf", [\out, 0, \bufnum, sampleFiveBuffer]);
+
+sampleSixBuffer = Buffer.read(s, thisProcess.nowExecutingPath.dirname +/+ "triangle.aif");
+sampleSix = Synth.new("\help_PlayBuf", [\out, 0, \bufnum, sampleSixBuffer]);
+
+sampleSevenBuffer = Buffer.read(s, thisProcess.nowExecutingPath.dirname +/+ "electricwires.wav");
+sampleSeven = Synth.new("\help_PlayBuf", [\out, 0, \bufnum, sampleSevenBuffer]);
 
 f = { |msg, time, addr|
 	var distance, distanceVolume, distanceVolumeStep, dvi, caveheight, chiStep, chi, gas, brake;
@@ -131,13 +140,36 @@ f = { |msg, time, addr|
 		sampleThree.set("volume", (linlin(msg[1], 0.00, sampleSensitivity, 1.0, 0.0)));
 
 	}
+
+	{msg[0] == '/DistToWhale'} {
+		"Dist to whale is %\n".postf(msg[1]);
+		//linlin(msg[1], 0.00, sampleSensitivity, 1.0, 0.0).postln;
+		sampleFive.set("volume", (linlin(msg[1], 0.00, sampleSensitivity, 1.0, 0.0)));
+
+	}
+
+	{msg[0] == '/DistToTwinkly'} {
+		"Dist to twinkly is %\n".postf(msg[1]);
+		//linlin(msg[1], 0.00, sampleSensitivity, 1.0, 0.0).postln;
+		sampleSix.set("volume", (linlin(msg[1], 0.00, sampleSensitivity, 1.0, 0.0)));
+
+	}
+
+	{msg[0] == '/DistToWires'} {
+		"Dist to wires is %\n".postf(msg[1]);
+		//linlin(msg[1], 0.00, sampleSensitivity, 1.0, 0.0).postln;
+		sampleSeven.set("volume", (linlin(msg[1], 0.00, sampleSensitivity, 1.0, 0.0)));
+
+	}
 };
 
 sampleOne.set("volume", 0.0);
 sampleTwo.set("volume", 0.0);
 sampleThree.set("volume", 0.0);
 sampleFour.set("volume", 0.0);
-
+sampleFive.set("volume", 0.0);
+sampleSix.set("volume", 0.0);
+sampleSeven.set("volume", 0.0);
 thisProcess.addOSCRecvFunc(f);
 //z = Synth.new(\zep);
 //s.sendMsg("s_new", "zep", z = 1010, 0, 1);
