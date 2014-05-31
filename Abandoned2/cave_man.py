@@ -33,6 +33,8 @@ class Cave:
 		depth = 3.049
 
 		#W,H,D
+#		blendVertical=0.19
+#		blendHorizontal=0.222
 		blendVertical=0.19
 		blendHorizontal=0.222
 		A=-width/2,height,0

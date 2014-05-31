@@ -344,7 +344,7 @@ CLIMB_ACCEL_RATE = 2.0
 climb_speed = 0
 CLIMB_DAMPING = 1
 CLIMB_PITCH_FACTOR = 3.0
-CLIMB_LOWER_LIMIT = -unit*0.05
+CLIMB_LOWER_LIMIT = -unit
 CLIMB_UPPER_LIMIT = unit
 
 #mouse-based climbing control
@@ -361,11 +361,11 @@ ROLL_FACTOR = 1.0
 #QUEUED TURNING - non-realistic wheel control
 QUEUED_TURNING = True
 turn_queue = 0
-QUEUED_TURN_RATIO = 0.1
-QUEUED_TURN_DEAD_ZONE = 0.5
+QUEUED_TURN_RATIO = 0.05
+QUEUED_TURN_DEAD_ZONE = QUEUED_TURN_RATIO*2
 QUEUED_TURN_DIRN = 1
-QUEUED_TURN_MAX_RATE = 10.0
-MAX_QUEUED_TURN_AMOUNT = QUEUED_TURN_MAX_RATE * 1.5 #the size of our queued turn buffer.
+QUEUED_TURN_MAX_RATE = 2.5
+MAX_QUEUED_TURN_AMOUNT = QUEUED_TURN_MAX_RATE * 4.0 #the size of our queued turn buffer.
 
 #autopilot to pos is a nice blank tile
 def AUTOPILOT_TO_POS():
@@ -709,6 +709,8 @@ def mouseWheel(direction):
 	
 	if abs(turn_queue) > MAX_QUEUED_TURN_AMOUNT:
 		turn_queue = math.copysign(MAX_QUEUED_TURN_AMOUNT, turn_queue)
+		
+	#print turn_queue
 	
 viz.callback(viz.MOUSEWHEEL_EVENT, mouseWheel) 
 
