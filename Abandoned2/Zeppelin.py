@@ -1,11 +1,10 @@
-﻿import viz
+﻿#importing this file creates a bunch of zeppelin models
+
+import viz
 import vizshape
 import vizact
 import random
 import math
-
-
-#viz.go()
 
 #copied code from cave
 scaling = 5600

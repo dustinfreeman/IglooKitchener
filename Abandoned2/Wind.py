@@ -1,4 +1,6 @@
-﻿import math
+﻿#Randomized wind in the environment, which the user Zeppelin accesses.
+
+import math
 import random
 
 class Wind:

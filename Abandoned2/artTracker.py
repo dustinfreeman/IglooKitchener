@@ -1,18 +1,12 @@
-﻿import socket
+﻿#Dustin: this file is a mess and I don't know what's going on.
+
+import socket
 import vizact
 import viz
 import random
 import math
 
 random.seed(1)
-
-
-
-
-
-
-
-
 
 
 #The maximum amount of data to receive at a time
